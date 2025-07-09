@@ -96,14 +96,59 @@ function Timer({ onSessionComplete }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      {message && <div className="mb-2 px-4 py-2 bg-indigo-100 text-indigo-800 rounded">{message}</div>}
-      <h2 className="text-2xl font-bold mb-2">{isFocus ? 'Focus' : 'Break'} Session</h2>
-      <div className="text-6xl font-mono mb-4">{formatTime(secondsLeft)}</div>
-      <div className="space-x-2">
-        <button onClick={start} className="px-4 py-2 bg-blue-500 text-white rounded" disabled={isRunning}>Start</button>
-        <button onClick={pause} className="px-4 py-2 bg-yellow-500 text-white rounded" disabled={!isRunning}>Pause</button>
-        <button onClick={reset} className="px-4 py-2 bg-gray-500 text-white rounded">Reset</button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col items-center border border-white/20">
+          {message && (
+            <div className="mb-6 w-full bg-indigo-100 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-xl flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {message}
+            </div>
+          )}
+          
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            {isFocus ? 'Focus' : 'Break'} Session
+          </h2>
+          <p className="text-gray-600 mb-8 text-center">
+            {isFocus ? 'Time to lock in and get productive!' : 'Take a well-deserved break.'}
+          </p>
+          
+          <div className="text-7xl md:text-8xl font-mono font-bold mb-8 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            {formatTime(secondsLeft)}
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <button 
+              onClick={start} 
+              className="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-semibold text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={isRunning}
+            >
+              {isRunning ? 'Running...' : 'Start'}
+            </button>
+            <button 
+              onClick={pause} 
+              className="flex-1 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 font-semibold text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={!isRunning}
+            >
+              Pause
+            </button>
+            <button 
+              onClick={reset} 
+              className="flex-1 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200 font-semibold text-lg shadow-lg"
+            >
+              Reset
+            </button>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+              <div className={`w-2 h-2 rounded-full mr-2 ${isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+              {isRunning ? 'Session Active' : 'Ready to Start'}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
