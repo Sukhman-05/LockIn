@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 const socket = io(import.meta.env.VITE_SOCKET_URL);
 
 function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -53,8 +53,14 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Dashboard</h1>
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <button 
+            onClick={logout} 
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium text-sm"
+          >
+            Logout
+          </button>
         </div>
         
         <StudyPods user={user} />
