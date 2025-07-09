@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('AuthContext useEffect, token:', token);
     if (token) {
       // Optionally decode token for user info, or fetch user profile
       setUser({ token });
