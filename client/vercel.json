@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://lockin-emt7.onrender.com" }
+    { "source": "/api/(.*)", "destination": "https://lockin-emt7.onrender.com/api/$1" }
   ]
 } 
