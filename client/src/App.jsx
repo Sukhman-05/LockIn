@@ -5,6 +5,14 @@ import { useAuth } from './AuthContext';
 import Timer from './Timer';
 import Dashboard from './Dashboard';
 
+function Spinner() {
+  return (
+    <div className="flex justify-center items-center h-20">
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+}
+
 function Home() {
   const { user, logout } = useAuth();
   return (
@@ -34,6 +42,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -51,8 +60,8 @@ function Login() {
     }
     try {
       const res = await axios.post('/api/auth/login', form);
-      localStorage.setItem('token', res.data.token);
-      navigate('/');
+      login(res.data.token);
+      setTimeout(() => navigate('/'), 500);
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed.');
     } finally {
@@ -82,10 +91,10 @@ function Login() {
         />
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full flex items-center justify-center"
           disabled={loading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? <Spinner /> : 'Login'}
         </button>
         {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
       </form>
@@ -158,10 +167,10 @@ function Register() {
         />
         <button
           type="submit"
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full"
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full flex items-center justify-center"
           disabled={loading}
         >
-          {loading ? 'Registering...' : 'Register'}
+          {loading ? <Spinner /> : 'Register'}
         </button>
         {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
         {success && <p className="text-green-500 mt-2 text-sm">{success}</p>}
@@ -173,7 +182,7 @@ function Register() {
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
-  console.log('ProtectedRoute user:', user);
+  if (user === undefined) return <Spinner />;
   if (!user) return <Navigate to="/login" />;
   return children;
 }
