@@ -15,8 +15,8 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token');
     console.log('AuthContext useEffect, token:', token);
     if (token) {
-      // Optionally decode token for user info, or fetch user profile
       setUser({ token });
+      console.log('User set in AuthContext:', { token });
     }
     setLoading(false);
   }, []);

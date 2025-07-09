@@ -173,6 +173,7 @@ function Register() {
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
+  console.log('ProtectedRoute user:', user);
   if (!user) return <Navigate to="/login" />;
   return children;
 }
