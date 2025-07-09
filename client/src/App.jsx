@@ -13,17 +13,6 @@ function Spinner() {
   );
 }
 
-function Logo() {
-  return (
-    <div className="flex items-center justify-center mb-6">
-      {/* Replace with your SVG logo if available */}
-      <div className="bg-gradient-to-br from-indigo-400 to-blue-400 rounded-full h-14 w-14 flex items-center justify-center shadow-md">
-        <span className="text-white text-3xl font-bold select-none">L</span>
-      </div>
-    </div>
-  );
-}
-
 function Navbar() {
   const { user, logout } = useAuth();
   return (
@@ -60,13 +49,6 @@ function Home() {
       <Navbar />
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
         <div className="w-full max-w-md mx-auto text-center">
-          {/* Simple Logo */}
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          
           {/* Main CTA */}
           <div className="space-y-4">
             {user ? (
@@ -140,11 +122,6 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       <main className="w-full max-w-sm mx-auto">
         <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-8 flex flex-col items-center border border-gray-100">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl h-12 w-12 flex items-center justify-center shadow-lg mb-6">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Sign In</h2>
           {error && (
             <div className="mb-4 flex items-center bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg w-full">
@@ -223,11 +200,6 @@ function Register() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       <main className="w-full max-w-sm mx-auto">
         <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-8 flex flex-col items-center border border-gray-100">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl h-12 w-12 flex items-center justify-center shadow-lg mb-6">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Create Account</h2>
           {error && (
             <div className="mb-4 flex items-center bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg w-full">
