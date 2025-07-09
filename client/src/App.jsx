@@ -48,22 +48,22 @@ function Navbar() {
 function Home() {
   const { user } = useAuth();
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-100 via-blue-100 to-purple-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-center w-full px-4">
-        <div className="bg-white/90 shadow-2xl rounded-3xl p-10 w-full max-w-xl flex flex-col items-center mt-16 mb-8">
+      <main className="flex flex-1 flex-col items-center justify-center text-center px-4">
+        <div className="w-full max-w-2xl bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl p-10 md:p-16 flex flex-col items-center border border-white/10">
           <Logo />
-          <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-700 mb-2 text-center leading-tight">Lock-In</h1>
-          <p className="text-lg text-gray-500 mb-8 text-center">A beautiful, gamified focus app for students. Stay productive, earn rewards, and lock in together.</p>
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-4 drop-shadow-lg tracking-tight">Lock-In</h1>
+          <p className="text-lg md:text-2xl text-gray-300 mb-8 max-w-xl">A beautiful, gamified focus app for students. Stay productive, earn rewards, and lock in together.</p>
           {user ? (
-            <div className="flex flex-col items-center space-y-4 w-full">
-              <Link to="/dashboard" className="w-full py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition text-center text-lg font-semibold shadow">Go to Dashboard</Link>
-              <Link to="/timer" className="w-full py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition text-center text-lg font-semibold shadow">Start Timer</Link>
+            <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
+              <Link to="/dashboard" className="flex-1 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition text-center text-lg font-semibold shadow-lg">Go to Dashboard</Link>
+              <Link to="/timer" className="flex-1 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition text-center text-lg font-semibold shadow-lg">Start Timer</Link>
             </div>
           ) : (
-            <div className="flex flex-col items-center space-y-4 w-full">
-              <Link to="/login" className="w-full py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition text-center text-lg font-semibold shadow">Login</Link>
-              <Link to="/register" className="w-full py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition text-center text-lg font-semibold shadow">Register</Link>
+            <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
+              <Link to="/login" className="flex-1 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition text-center text-lg font-semibold shadow-lg">Login</Link>
+              <Link to="/register" className="flex-1 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition text-center text-lg font-semibold shadow-lg">Register</Link>
             </div>
           )}
         </div>
