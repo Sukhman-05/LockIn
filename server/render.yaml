@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: lockin-backend
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node index.js"
+    envVars:
+      - key: MONGO_URI
+        value: ${{ MONGO_URI }}
+      - key: JWT_SECRET
+        value: ${{ JWT_SECRET }}
+    autoDeploy: true 
