@@ -30,18 +30,19 @@ function Navbar() {
     <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg h-8 w-8 flex items-center justify-center shadow-md">
-            <span className="text-white text-lg font-bold select-none">L</span>
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg h-8 w-8 flex items-center justify-center shadow-md">
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <span className="font-bold text-gray-900 text-lg">Lock-In</span>
         </div>
         {user && (
           <div className="flex items-center space-x-4">
-            <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors text-sm">Dashboard</Link>
-            <Link to="/timer" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors text-sm">Timer</Link>
+            <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm">Dashboard</Link>
+            <Link to="/timer" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm">Timer</Link>
             <button 
               onClick={logout} 
-              className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-md hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium shadow-md text-sm"
+              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200 font-medium text-sm"
             >
               Logout
             </button>
@@ -55,88 +56,49 @@ function Navbar() {
 function Home() {
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navbar />
-      <main className="flex flex-1 flex-col items-center justify-center text-center px-4 py-12">
-        <div className="w-full max-w-4xl mx-auto">
-          {/* Hero Section */}
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
-              Lock-In
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-              The ultimate focus app for students. Stay productive, earn rewards, and lock in together.
-            </p>
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
+        <div className="w-full max-w-md mx-auto text-center">
+          {/* Simple Logo */}
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-
-          {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-lg">
-              <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Pomodoro Timer</h3>
-              <p className="text-sm text-gray-600">Stay focused with our proven 25/5 minute technique</p>
-            </div>
-            
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-lg">
-              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Study Pods</h3>
-              <p className="text-sm text-gray-600">Join virtual study groups and stay motivated together</p>
-            </div>
-            
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-lg">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Gamification</h3>
-              <p className="text-sm text-gray-600">Earn XP, level up, and compete on the leaderboard</p>
-            </div>
-          </div>
-
-          {/* CTA Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/50 shadow-xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Ready to lock in?
-            </h2>
+          
+          {/* Main CTA */}
+          <div className="space-y-4">
             {user ? (
-              <div className="flex flex-col md:flex-row gap-3 justify-center">
-                <Link 
-                  to="/dashboard" 
-                  className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 text-base font-semibold shadow-lg"
-                >
-                  Go to Dashboard
-                </Link>
+              <>
                 <Link 
                   to="/timer" 
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 text-base font-semibold shadow-lg"
+                  className="block w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 font-medium shadow-lg"
                 >
-                  Start Timer
+                  Start Focus Session
                 </Link>
-              </div>
+                <Link 
+                  to="/dashboard" 
+                  className="block w-full py-3 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-gray-200"
+                >
+                  View Progress
+                </Link>
+              </>
             ) : (
-              <div className="flex flex-col md:flex-row gap-3 justify-center">
+              <>
                 <Link 
                   to="/login" 
-                  className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 text-base font-semibold shadow-lg"
+                  className="block w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 font-medium shadow-lg"
                 >
-                  Login
+                  Get Started
                 </Link>
                 <Link 
                   to="/register" 
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 text-base font-semibold shadow-lg"
+                  className="block w-full py-3 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white/90 transition-all duration-200 font-medium border border-gray-200"
                 >
-                  Register
+                  Create Account
                 </Link>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -175,14 +137,15 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50 to-indigo-50 p-4">
-      <main className="w-full max-w-md mx-auto">
-        <div className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl p-6 md:p-8 flex flex-col items-center border border-white/50">
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl h-12 w-12 flex items-center justify-center shadow-lg mb-4">
-            <span className="text-white text-xl font-bold select-none">L</span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+      <main className="w-full max-w-sm mx-auto">
+        <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-8 flex flex-col items-center border border-gray-100">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl h-12 w-12 flex items-center justify-center shadow-lg mb-6">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
-          <p className="text-gray-600 mb-6 text-center">Log in to lock in your focus</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Sign In</h2>
           {error && (
             <div className="mb-4 flex items-center bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg w-full">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z" /></svg>
@@ -197,7 +160,7 @@ function Login() {
               autoComplete="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-base bg-white/50 backdrop-blur-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white/50 backdrop-blur-sm"
             />
             <input
               type="password"
@@ -206,19 +169,19 @@ function Login() {
               autoComplete="current-password"
               value={form.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-base bg-white/50 backdrop-blur-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white/50 backdrop-blur-sm"
             />
             <button
               type="submit"
-              className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center text-base font-semibold shadow-lg"
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center text-sm font-medium shadow-lg"
               disabled={loading}
             >
-              {loading ? <Spinner /> : 'Log In'}
+              {loading ? <Spinner /> : 'Sign In'}
             </button>
           </form>
           <div className="mt-6 text-center w-full">
-            <span className="text-gray-600 text-sm">Don't have an account? </span>
-            <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors text-sm">Register</Link>
+            <span className="text-gray-500 text-xs">Don't have an account? </span>
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium transition-colors text-xs">Sign Up</Link>
           </div>
         </div>
       </main>
@@ -257,14 +220,15 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50 to-indigo-50 p-4">
-      <main className="w-full max-w-md mx-auto">
-        <div className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl p-6 md:p-8 flex flex-col items-center border border-white/50">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl h-12 w-12 flex items-center justify-center shadow-lg mb-4">
-            <span className="text-white text-xl font-bold select-none">L</span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+      <main className="w-full max-w-sm mx-auto">
+        <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-8 flex flex-col items-center border border-gray-100">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl h-12 w-12 flex items-center justify-center shadow-lg mb-6">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
-          <p className="text-gray-600 mb-6 text-center">Join and start locking in your focus</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Create Account</h2>
           {error && (
             <div className="mb-4 flex items-center bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg w-full">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z" /></svg>
@@ -285,7 +249,7 @@ function Register() {
               autoComplete="username"
               value={form.username}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent text-base bg-white/50 backdrop-blur-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white/50 backdrop-blur-sm"
             />
             <input
               type="email"
@@ -294,7 +258,7 @@ function Register() {
               autoComplete="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent text-base bg-white/50 backdrop-blur-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white/50 backdrop-blur-sm"
             />
             <input
               type="password"
@@ -303,19 +267,19 @@ function Register() {
               autoComplete="new-password"
               value={form.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent text-base bg-white/50 backdrop-blur-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white/50 backdrop-blur-sm"
             />
             <button
               type="submit"
-              className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center justify-center text-base font-semibold shadow-lg"
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center text-sm font-medium shadow-lg"
               disabled={loading}
             >
-              {loading ? <Spinner /> : 'Register'}
+              {loading ? <Spinner /> : 'Create Account'}
             </button>
           </form>
           <div className="mt-6 text-center w-full">
-            <span className="text-gray-600 text-sm">Already have an account? </span>
-            <Link to="/login" className="text-green-600 hover:text-green-700 font-semibold transition-colors text-sm">Login</Link>
+            <span className="text-gray-500 text-xs">Already have an account? </span>
+            <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium transition-colors text-xs">Sign In</Link>
           </div>
         </div>
       </main>
