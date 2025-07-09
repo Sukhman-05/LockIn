@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from './AuthContext';
 import { io } from 'socket.io-client';
 
-const socket = io('/');
+const socket = io(import.meta.env.VITE_SOCKET_URL);
 
 function Dashboard() {
   const { user } = useAuth();
