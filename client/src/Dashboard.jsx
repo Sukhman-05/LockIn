@@ -40,7 +40,9 @@ export default function Dashboard() {
   const [showXPHelp, setShowXPHelp] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    return sessionStorage.getItem('welcomeShown') !== 'true';
+  });
   const avatar = getAvatar();
   const navigate = useNavigate();
 
@@ -66,7 +68,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (showWelcome) {
-      const timer = setTimeout(() => setShowWelcome(false), 5000);
+      const timer = setTimeout(() => {
+        setShowWelcome(false);
+        sessionStorage.setItem('welcomeShown', 'true');
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [showWelcome]);
@@ -108,6 +113,9 @@ export default function Dashboard() {
   // HP bar animation
   const hpPercent = Math.max(0, Math.min(100, profile.hp));
 
+  // Portrait logic
+  const portrait = profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png';
+
   return (
     <div className="flex flex-col items-center w-full max-w-2xl mx-auto gap-8 relative">
       {showWelcome && profile.username && (
@@ -123,9 +131,9 @@ export default function Dashboard() {
       <button onClick={() => setMuted(m => !m)} className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded-full shadow-pixel text-pixelYellow text-xl font-bold z-10" title={muted ? 'Unmute music' : 'Mute music'}>
         {muted ? '🔇' : '🔊'}
       </button>
-      {/* Character (bobbing idle animation) */}
-      <div className={`transition-transform duration-700 ${bob ? 'translate-y-2' : '-translate-y-2'}`}>
-        <PixelAvatar {...avatar} size={128} />
+      {/* User Portrait */}
+      <div className="flex items-center justify-center my-4">
+        <img src={portrait} alt="User Portrait" className="w-40 h-56 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray" />
       </div>
       {/* HP and XP Bars */}
       <div className="flex flex-col items-center gap-2 w-full">

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../AuthContext';
 
 const PORTRAITS = [
   {
@@ -19,14 +21,32 @@ const PORTRAITS = [
 ];
 
 export default function CustomizeCharacter() {
+  const { user } = useAuth();
   const [selected, setSelected] = useState(() => {
     return localStorage.getItem('selectedPortrait') || PORTRAITS[0].img;
   });
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
   const current = PORTRAITS.find(p => p.img === selected) || PORTRAITS[0];
 
   const handleSelect = (img) => {
     setSelected(img);
     localStorage.setItem('selectedPortrait', img);
+  };
+
+  const handleConfirm = async () => {
+    setError('');
+    setSuccess(false);
+    try {
+      await axios.patch('/api/auth/me', { portrait: selected }, {
+        headers: { Authorization: `Bearer ${user?.token}` }
+      });
+      setSuccess(true);
+      localStorage.setItem('selectedPortrait', selected);
+      setTimeout(() => setSuccess(false), 2000);
+    } catch (err) {
+      setError('Failed to save portrait.');
+    }
   };
 
   return (
@@ -59,7 +79,9 @@ export default function CustomizeCharacter() {
           </div>
         </div>
       </div>
-      <button className="mt-10 px-10 py-3 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel" onClick={() => alert('Character selected!')}>Confirm</button>
+      <button className="mt-10 px-10 py-3 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel" onClick={handleConfirm}>Confirm</button>
+      {success && <div className="mt-4 text-pixelGreen font-pixel text-base">Portrait saved!</div>}
+      {error && <div className="mt-4 text-pixelRed font-pixel text-base">{error}</div>}
     </div>
   );
 } 
