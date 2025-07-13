@@ -3,6 +3,7 @@ import PixelAvatar from './components/PixelAvatar';
 import PixelStreakCalendar from './components/PixelStreakCalendar';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
+import Timer from './Timer';
 
 function getAvatar() {
   try {
@@ -39,6 +40,8 @@ export default function Dashboard() {
   const [profile, setProfile] = useState({ username: '', level: 1, xp: 0, xpMax: 100, hp: 100 });
   const [streakHistory, setStreakHistory] = useState([]);
   const [showXPHelp, setShowXPHelp] = useState(false);
+  const [showTimer, setShowTimer] = useState(false);
+  const [muted, setMuted] = useState(false);
   const avatar = getAvatar();
 
   useEffect(() => {
@@ -86,12 +89,14 @@ export default function Dashboard() {
       audio.id = 'bg-music';
       audio.src = 'https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae5b2.mp3'; // Free chiptune loop
       audio.loop = true;
-      audio.volume = 0.2;
+      audio.volume = muted ? 0 : 0.2;
       document.body.appendChild(audio);
+    } else {
+      audio.volume = muted ? 0 : 0.2;
     }
     audio.play().catch(() => {});
     return () => { audio.pause(); };
-  }, []);
+  }, [muted]);
 
   // HP bar animation
   const hpPercent = Math.max(0, Math.min(100, profile.hp));
@@ -104,6 +109,10 @@ export default function Dashboard() {
       {/* XP Help */}
       <button onClick={() => setShowXPHelp(true)} className="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-pixelYellow border-2 border-pixelOrange rounded-full shadow-pixel text-pixelGray text-2xl font-bold z-10" title="How to gain XP?">?</button>
       <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
+      {/* Mute/unmute soundtrack */}
+      <button onClick={() => setMuted(m => !m)} className="absolute top-2 right-20 w-10 h-10 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded-full shadow-pixel text-pixelYellow text-xl font-bold z-10" title={muted ? 'Unmute music' : 'Mute music'}>
+        {muted ? '🔇' : '🔊'}
+      </button>
       {/* Character (bobbing idle animation) */}
       <div className={`transition-transform duration-700 ${bob ? 'translate-y-2' : '-translate-y-2'}`}>
         <PixelAvatar {...avatar} size={128} />
@@ -127,10 +136,22 @@ export default function Dashboard() {
           </span>
         </div>
       </div>
-      {/* Study Pods Button */}
-      <button className="px-10 py-4 bg-pixelYellow text-pixelGray border-4 border-pixelOrange rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelOrange hover:text-white transition-all">
+      {/* Study Pods Button (idle animation) */}
+      <button
+        className={`px-10 py-4 bg-pixelYellow text-pixelGray border-4 border-pixelOrange rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelOrange hover:text-white transition-all animate-bounce-slow`}
+        onClick={() => setShowTimer(true)}
+      >
         Study Pods
       </button>
+      {/* Timer Modal */}
+      {showTimer && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/60">
+          <div className="bg-pixelGray border-4 border-pixelYellow rounded-lg shadow-pixel p-8 flex flex-col items-center relative">
+            <button onClick={() => setShowTimer(false)} className="absolute top-2 right-2 px-3 py-1 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all">Close</button>
+            <Timer onSessionUpdate={() => { setShowTimer(false); setTimeout(() => { window.location.reload(); }, 500); }} />
+          </div>
+        </div>
+      )}
       {/* Streak Calendar */}
       <PixelStreakCalendar streakHistory={streakHistory} />
     </div>

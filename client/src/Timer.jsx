@@ -4,34 +4,28 @@ import { useAuth } from './AuthContext';
 
 const DEFAULT_FOCUS_MINUTES = 25;
 const DEFAULT_BREAK_MINUTES = 5;
+const HP_LOSS_ON_QUIT = 10;
 
-function Timer({ onSessionComplete }) {
+function playSound(url) {
+  const audio = new window.Audio(url);
+  audio.volume = 0.3;
+  audio.play();
+}
+
+export default function Timer({ onSessionUpdate }) {
   const [secondsLeft, setSecondsLeft] = useState(DEFAULT_FOCUS_MINUTES * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isFocus, setIsFocus] = useState(true);
   const [focusMinutes, setFocusMinutes] = useState(DEFAULT_FOCUS_MINUTES);
   const [breakMinutes, setBreakMinutes] = useState(DEFAULT_BREAK_MINUTES);
   const [showSettings, setShowSettings] = useState(false);
+  const [feedback, setFeedback] = useState('');
   const intervalRef = useRef(null);
   const { user } = useAuth();
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (message) {
-      if (window.Notification && Notification.permission === 'granted') {
-        new Notification(message);
-      }
-      const timeout = setTimeout(() => setMessage(''), 3000);
-      return () => clearTimeout(timeout);
-    }
-  }, [message]);
-
-  const notify = (msg) => {
-    setMessage(msg);
-    if (window.Notification && Notification.permission !== 'granted') {
-      Notification.requestPermission();
-    }
-  };
+    setSecondsLeft(isFocus ? focusMinutes * 60 : breakMinutes * 60);
+  }, [focusMinutes, breakMinutes, isFocus]);
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -42,14 +36,14 @@ function Timer({ onSessionComplete }) {
   const start = () => {
     if (isRunning) return;
     setIsRunning(true);
-    notify('Locked In session started');
+    playSound('https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b1b2b2.mp3'); // start sound
     intervalRef.current = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(intervalRef.current);
           setIsRunning(false);
-          notify('Locked Out! Session complete');
           handleSessionComplete(isFocus);
+          playSound('https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b1b2b2.mp3'); // complete sound
           if (isFocus) {
             setIsFocus(false);
             return breakMinutes * 60;
@@ -68,118 +62,129 @@ function Timer({ onSessionComplete }) {
     clearInterval(intervalRef.current);
   };
 
-  const reset = () => {
+  // Quit: reset while running = lose HP
+  const reset = async () => {
+    if (isRunning && user) {
+      setFeedback('-10 HP (quit early!)');
+      playSound('https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b1b2b2.mp3'); // fail sound
+      try {
+        await axios.patch('/api/sessions/hp', { loss: HP_LOSS_ON_QUIT }, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        if (onSessionUpdate) onSessionUpdate();
+      } catch {}
+    }
     setIsRunning(false);
     clearInterval(intervalRef.current);
     setIsFocus(true);
     setSecondsLeft(focusMinutes * 60);
   };
 
-  const saveSession = async (isFocus) => {
-    if (!user || !isFocus) return;
+  // Save session and update XP/streak
+  const saveSession = async () => {
+    if (!user) return;
     const now = new Date();
+    const duration = focusMinutes * 60;
     const session = {
-      start: new Date(now.getTime() - focusMinutes * 60 * 1000),
+      start: new Date(now.getTime() - duration * 1000),
       end: now,
-      duration: focusMinutes * 60,
+      duration,
       type: 'focus',
     };
     try {
       await axios.post('/api/sessions', session, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-    } catch (err) {
-      // Optionally handle error
-    }
+      setFeedback(`+${focusMinutes} XP!`);
+      if (onSessionUpdate) onSessionUpdate();
+    } catch {}
   };
 
-  const handleSessionComplete = (isFocus) => {
-    saveSession(isFocus);
-    if (onSessionComplete) onSessionComplete(isFocus);
+  const handleSessionComplete = (wasFocus) => {
+    if (wasFocus) saveSession();
   };
+
+  // Idle animation: pulsing timer
+  const [pulse, setPulse] = useState(false);
+  useEffect(() => {
+    const interval = setInterval(() => setPulse(p => !p), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-transparent">
       <div className="w-full max-w-sm">
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 flex flex-col items-center border border-gray-100">
-          {message && (
-            <div className="mb-6 w-full bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg flex items-center">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {message}
+        <div className="bg-pixelGray border-4 border-pixelYellow rounded-lg shadow-pixel p-8 flex flex-col items-center">
+          {feedback && (
+            <div className="mb-4 w-full bg-pixelYellow text-pixelGray border-2 border-pixelOrange px-4 py-2 rounded font-pixel text-center animate-pulse">
+              {feedback}
             </div>
           )}
-          
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+          <h2 className="text-lg text-pixelYellow mb-2 font-pixel">
             {isFocus ? 'Focus' : 'Break'}
           </h2>
-          
-          <div className="text-6xl font-mono font-bold mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <div className={`text-6xl font-pixel font-bold mb-8 text-center text-pixelYellow transition-all duration-500 ${pulse ? 'scale-110' : 'scale-100'}`}
+            style={{ textShadow: '0 0 8px #ffe066, 0 0 2px #fff' }}>
             {formatTime(secondsLeft)}
           </div>
-          
           <div className="flex gap-3 w-full">
-            <button 
-              onClick={start} 
-              className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed" 
+            <button
+              onClick={start}
+              className="flex-1 py-3 bg-pixelGreen text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isRunning}
             >
               {isRunning ? 'Running' : 'Start'}
             </button>
-            <button 
-              onClick={pause} 
-              className="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed" 
+            <button
+              onClick={pause}
+              className="flex-1 py-3 bg-pixelOrange text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!isRunning}
             >
               Pause
             </button>
-            <button 
-              onClick={reset} 
-              className="flex-1 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 font-medium"
+            <button
+              onClick={reset}
+              className="flex-1 py-3 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200"
             >
-              Reset
+              Quit
             </button>
           </div>
-          
           <div className="mt-6 text-center">
-            <div className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-              <div className={`w-2 h-2 rounded-full mr-2 ${isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+            <div className="inline-flex items-center px-3 py-1 bg-pixelYellow text-pixelGray rounded-full text-xs font-pixel">
+              <div className={`w-2 h-2 rounded-full mr-2 ${isRunning ? 'bg-pixelGreen animate-pulse' : 'bg-pixelGray'}`}></div>
               {isRunning ? 'Active' : 'Ready'}
             </div>
           </div>
-          
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="mt-4 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+            className="mt-4 text-sm text-pixelYellow hover:text-pixelOrange font-pixel transition-colors"
           >
             ⚙️ Settings
           </button>
-          
           {showSettings && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-900 mb-3">Timer Settings</h4>
+            <div className="mt-4 p-4 bg-pixelGray border-2 border-pixelYellow rounded">
+              <h4 className="text-sm font-pixel text-pixelYellow mb-3">Timer Settings</h4>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Focus Duration (minutes)</label>
+                  <label className="block text-xs text-pixelYellow mb-1 font-pixel">Focus Duration (minutes)</label>
                   <input
                     type="number"
                     min="1"
                     max="120"
                     value={focusMinutes}
-                    onChange={(e) => setFocusMinutes(parseInt(e.target.value) || DEFAULT_FOCUS_MINUTES)}
-                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
+                    onChange={(e) => setFocusMinutes(Math.max(1, parseInt(e.target.value) || DEFAULT_FOCUS_MINUTES))}
+                    className="w-full px-2 py-1 text-sm border border-pixelYellow rounded font-pixel bg-pixelGray text-pixelYellow"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Break Duration (minutes)</label>
+                  <label className="block text-xs text-pixelYellow mb-1 font-pixel">Break Duration (minutes)</label>
                   <input
                     type="number"
                     min="1"
                     max="30"
                     value={breakMinutes}
-                    onChange={(e) => setBreakMinutes(parseInt(e.target.value) || DEFAULT_BREAK_MINUTES)}
-                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
+                    onChange={(e) => setBreakMinutes(Math.max(1, parseInt(e.target.value) || DEFAULT_BREAK_MINUTES))}
+                    className="w-full px-2 py-1 text-sm border border-pixelYellow rounded font-pixel bg-pixelGray text-pixelYellow"
                   />
                 </div>
               </div>
@@ -189,6 +194,4 @@ function Timer({ onSessionComplete }) {
       </div>
     </div>
   );
-}
-
-export default Timer; 
+} 
