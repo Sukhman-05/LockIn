@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from './utils/api';
 import { useAuth } from './AuthContext';
 import PixelStreakCalendar from './components/PixelStreakCalendar';
+import Chatbot from './components/Chatbot';
 
 const DEFAULT_FOCUS_MINUTES = 25;
 const DEFAULT_BREAK_MINUTES = 5;
@@ -50,6 +51,7 @@ export default function Timer({ onSessionUpdate }) {
   const [profile, setProfile] = useState({});
   const [totalSessions, setTotalSessions] = useState(0);
   const [sessionMilestone, setSessionMilestone] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
   const intervalRef = useRef(null);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -215,6 +217,15 @@ export default function Timer({ onSessionUpdate }) {
     }
   };
 
+  const handleAddTasksFromChatbot = (newTasks) => {
+    const tasksToAdd = newTasks.map(task => ({
+      text: task,
+      done: false,
+      id: Date.now() + Math.random()
+    }));
+    setTasks(prevTasks => [...prevTasks, ...tasksToAdd]);
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 bg-transparent">
       <div className="w-full max-w-3xl mx-auto flex flex-col gap-4 md:gap-8">
@@ -253,7 +264,16 @@ export default function Timer({ onSessionUpdate }) {
           {/* Task List */}
           <div className="w-full bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 md:p-6 flex flex-col items-center">
             <div className="flex items-center justify-between mb-2 w-full">
-              <h3 className="text-pixelYellow font-pixel text-sm md:text-base">Tasks ({tasks.length})</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-pixelYellow font-pixel text-sm md:text-base">Tasks ({tasks.length})</h3>
+                <button
+                  onClick={() => setShowChatbot(true)}
+                  className="px-2 py-1 bg-pixelYellow text-pixelGray rounded text-xs font-pixel hover:bg-pixelOrange transition-colors"
+                  title="Get help from AI Study Buddy"
+                >
+                  🤖 AI Help
+                </button>
+              </div>
               <div className="text-pixelYellow/60 font-pixel text-xs md:text-sm">
                 {tasks.filter(t => t.done).length}/{tasks.length} completed
               </div>
@@ -385,6 +405,24 @@ export default function Timer({ onSessionUpdate }) {
           </div>
         </div>
       </div>
+      
+      {/* Floating Chatbot Button */}
+      {!showChatbot && (
+        <button
+          onClick={() => setShowChatbot(true)}
+          className="fixed bottom-6 right-6 w-16 h-16 bg-pixelYellow border-4 border-pixelOrange rounded-full shadow-pixel flex items-center justify-center text-pixelGray text-2xl font-bold hover:bg-pixelOrange hover:scale-110 transition-all duration-200 z-40"
+          title="Chat with AI Study Buddy"
+        >
+          🤖
+        </button>
+      )}
+
+      {/* Chatbot Modal */}
+      <Chatbot 
+        isOpen={showChatbot}
+        onClose={() => setShowChatbot(false)}
+        onAddTasks={handleAddTasksFromChatbot}
+      />
     </div>
   );
 } 

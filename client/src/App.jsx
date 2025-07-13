@@ -9,12 +9,14 @@ import { useBackground } from './BackgroundContext';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Timer from './Timer';
+import Chatbot from './components/Chatbot';
 
 const tabs = [
   { name: 'Dashboard', path: '/' },
   { name: 'Profile', path: '/profile' },
   { name: 'Customize', path: '/customize' },
   { name: 'Study Pods', path: '/studypods' },
+  { name: '🤖 AI Buddy', path: '/chatbot' },
 ];
 
 function PixelNavbar({ onXPHelp }) {
@@ -79,6 +81,7 @@ function RequireAuth({ children }) {
 export default function App() {
   const { currentTheme } = useBackground();
   const [showXPHelp, setShowXPHelp] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col font-pixel global-background bg-transparent">
@@ -94,6 +97,7 @@ export default function App() {
             <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             <Route path="/customize" element={<RequireAuth><CustomizeCharacter /></RequireAuth>} />
             <Route path="/studypods" element={<RequireAuth><Timer /></RequireAuth>} />
+            <Route path="/chatbot" element={<RequireAuth><div className="flex items-center justify-center min-h-screen"><Chatbot isOpen={true} onClose={() => setShowChatbot(false)} /></div></RequireAuth>} />
           </Routes>
         </main>
         {/* XP Help Modal (global) */}
