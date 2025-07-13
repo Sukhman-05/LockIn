@@ -51,6 +51,7 @@ export default function CustomizeCharacter() {
   const handleBgColor = (color) => {
     setBgColor(color);
     localStorage.setItem('selectedBackground', color);
+    setBackground(color); // Immediately apply the background color
     setSuccess(false);
   };
 
