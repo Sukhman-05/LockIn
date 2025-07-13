@@ -99,7 +99,7 @@ export default function Dashboard() {
     if (!audio) {
       audio = document.createElement('audio');
       audio.id = 'bg-music';
-      audio.src = 'public/your-music.mp3';
+      audio.src = '/music.mp3';
       audio.loop = true;
       audio.volume = muted ? 0 : 0.2;
       document.body.appendChild(audio);
