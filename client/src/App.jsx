@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import Dashboard from './Dashboard';
+import Dashboard, { XPHelpModal } from './Dashboard';
 import Profile from './components/Profile';
 import CustomizeCharacter from './components/CustomizeCharacter';
 import { useAuth } from './AuthContext';
@@ -97,7 +97,7 @@ export default function App() {
           </Routes>
         </main>
         {/* XP Help Modal (global) */}
-        <Dashboard.XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
+        <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
       </div>
     </div>
   );
