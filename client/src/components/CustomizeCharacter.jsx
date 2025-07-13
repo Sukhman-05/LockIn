@@ -48,7 +48,8 @@ export default function CustomizeCharacter() {
 
     try {
       console.log('Saving portrait:', selected);
-      const response = await axios.patch('/api/auth/me', 
+      const API = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.patch(`${API}/auth/me`, 
         { portrait: selected }, 
         { 
           headers: { 
