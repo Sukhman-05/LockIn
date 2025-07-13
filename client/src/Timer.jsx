@@ -230,7 +230,7 @@ export default function Timer({ onSessionUpdate }) {
             <img 
               src={portrait} 
               alt="Character Portrait" 
-              className="w-20 h-28 md:w-24 md:h-32 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray/80 backdrop-blur-sm" 
+              className="w-24 h-32 md:w-40 md:h-56 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray/80 backdrop-blur-sm" 
             />
           </div>
           {/* Stats */}

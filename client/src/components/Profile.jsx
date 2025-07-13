@@ -65,6 +65,7 @@ export default function Profile() {
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">HP</div>
               <div className="text-white text-xl font-pixel">{profile.hp}</div>
+              <div className="text-pixelYellow text-xs font-pixel mt-1">Health Points</div>
             </div>
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">Streak</div>

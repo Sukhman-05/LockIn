@@ -18,7 +18,7 @@ const BAR_COLORS = {
   }
 };
 
-export default function PixelBar({ type = 'xp', value = 0, max = 100 }) {
+export default function PixelBar({ type = 'xp', value = 0, max = 100, hideLabelOnDesktop = false }) {
   const { fill, border, text, label, glow } = BAR_COLORS[type] || BAR_COLORS.xp;
   const percent = type === 'hp' ? 100 : Math.max(0, Math.min(100, (value / max) * 100));
   // Pixel steps: 10 blocks
@@ -31,9 +31,17 @@ export default function PixelBar({ type = 'xp', value = 0, max = 100 }) {
         {label}: {value}/{max}
       </div>
       <div className={`w-64 h-8 flex items-center relative`}>
-        <span className={`absolute left-2 top-1/2 -translate-y-1/2 ${text} text-xs font-pixel z-10`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
-          {label}
-        </span>
+        {/* Hide label on desktop if prop is set */}
+        {!hideLabelOnDesktop && (
+          <span className={`absolute left-2 top-1/2 -translate-y-1/2 ${text} text-xs font-pixel z-10`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
+            {label}
+          </span>
+        )}
+        {hideLabelOnDesktop && (
+          <span className={`absolute left-2 top-1/2 -translate-y-1/2 ${text} text-xs font-pixel z-10 md:hidden`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
+            {label}
+          </span>
+        )}
         <div className={`absolute left-16 right-2 top-0 bottom-0 flex gap-0.5 px-1 py-1 ${border} border-4 rounded-none bg-pixelGray`} style={{ boxShadow: '0 0 0 2px #000, 0 0 8px #0008' }}>
           {[...Array(blocks)].map((_, i) => (
             <div
