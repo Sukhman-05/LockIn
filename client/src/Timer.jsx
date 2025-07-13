@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
@@ -20,12 +21,33 @@ export default function Timer({ onSessionUpdate }) {
   const [breakMinutes, setBreakMinutes] = useState(DEFAULT_BREAK_MINUTES);
   const [showSettings, setShowSettings] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [stats, setStats] = useState({ totalFocus: 0, sessions: 0, streak: 0 });
+  const [tasks, setTasks] = useState([]);
+  const [taskInput, setTaskInput] = useState('');
   const intervalRef = useRef(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setSecondsLeft(isFocus ? focusMinutes * 60 : breakMinutes * 60);
   }, [focusMinutes, breakMinutes, isFocus]);
+
+  useEffect(() => {
+    // Fetch stats from backend
+    async function fetchStats() {
+      try {
+        const res = await axios.get('/api/sessions/stats', {
+          headers: { Authorization: `Bearer ${user.token}` }
+        });
+        setStats({
+          totalFocus: res.data.totalFocusTime || 0,
+          sessions: res.data.totalSessions || 0,
+          streak: res.data.streak || 0
+        });
+      } catch {}
+    }
+    if (user) fetchStats();
+  }, [user]);
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -111,8 +133,56 @@ export default function Timer({ onSessionUpdate }) {
     return () => clearInterval(interval);
   }, []);
 
+  // Task logic
+  const addTask = () => {
+    if (taskInput.trim()) {
+      setTasks([...tasks, { text: taskInput, done: false }]);
+      setTaskInput('');
+    }
+  };
+  const toggleTask = idx => {
+    setTasks(tasks => tasks.map((t, i) => i === idx ? { ...t, done: !t.done } : t));
+  };
+  const removeTask = idx => {
+    setTasks(tasks => tasks.filter((_, i) => i !== idx));
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-transparent">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-transparent relative">
+      {/* Back Button */}
+      <button onClick={() => navigate('/')} className="absolute top-4 left-4 px-4 py-2 bg-pixelGray text-pixelYellow border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel z-10">
+        ← Back
+      </button>
+      {/* Stats */}
+      <div className="mb-4 w-full max-w-sm flex flex-col items-center gap-2">
+        <div className="flex gap-4 justify-center">
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Total Focus: {Math.round(stats.totalFocus / 60)} min</div>
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Sessions: {stats.sessions}</div>
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Streak: {stats.streak}</div>
+        </div>
+      </div>
+      {/* Task List */}
+      <div className="w-full max-w-sm mb-6">
+        <div className="flex gap-2 mb-2">
+          <input
+            className="flex-1 px-2 py-1 border-2 border-pixelYellow rounded font-pixel bg-pixelGray text-pixelYellow focus:outline-none"
+            placeholder="Add a task..."
+            value={taskInput}
+            onChange={e => setTaskInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && addTask()}
+          />
+          <button onClick={addTask} className="px-4 py-2 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel">Add</button>
+        </div>
+        <ul className="space-y-2">
+          {tasks.map((task, idx) => (
+            <li key={idx} className="flex items-center gap-2 bg-pixelGray border-2 border-pixelYellow rounded px-3 py-2">
+              <input type="checkbox" checked={task.done} onChange={() => toggleTask(idx)} className="accent-pixelYellow w-5 h-5" />
+              <span className={`flex-1 font-pixel text-pixelYellow text-sm ${task.done ? 'line-through opacity-60' : ''}`}>{task.text}</span>
+              <button onClick={() => removeTask(idx)} className="text-pixelRed font-bold btn-pixel">✕</button>
+            </li>
+          ))}
+        </ul>
+      </div>
       <div className="w-full max-w-sm">
         <div className="bg-pixelGray border-4 border-pixelYellow rounded-lg shadow-pixel p-8 flex flex-col items-center">
           {feedback && (
@@ -130,21 +200,21 @@ export default function Timer({ onSessionUpdate }) {
           <div className="flex gap-3 w-full">
             <button
               onClick={start}
-              className="flex-1 py-3 bg-pixelGreen text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-pixelGreen text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed btn-pixel"
               disabled={isRunning}
             >
               {isRunning ? 'Running' : 'Start'}
             </button>
             <button
               onClick={pause}
-              className="flex-1 py-3 bg-pixelOrange text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-pixelOrange text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed btn-pixel"
               disabled={!isRunning}
             >
               Pause
             </button>
             <button
               onClick={reset}
-              className="flex-1 py-3 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200"
+              className="flex-1 py-3 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 btn-pixel"
             >
               Quit
             </button>
@@ -157,7 +227,7 @@ export default function Timer({ onSessionUpdate }) {
           </div>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="mt-4 text-sm text-pixelYellow hover:text-pixelOrange font-pixel transition-colors"
+            className="mt-4 text-sm text-pixelYellow hover:text-pixelOrange font-pixel transition-colors btn-pixel"
           >
             ⚙️ Settings
           </button>

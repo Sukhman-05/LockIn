@@ -6,11 +6,13 @@ import CustomizeCharacter from './components/CustomizeCharacter';
 import { useAuth } from './AuthContext';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import Timer from './Timer';
 
 const tabs = [
   { name: 'Dashboard', path: '/' },
   { name: 'Profile', path: '/profile' },
   { name: 'Customize', path: '/customize' },
+  { name: 'Study Pods', path: '/studypods' },
 ];
 
 function PixelNavbar() {
@@ -31,7 +33,7 @@ function PixelNavbar() {
           <Link
             key={tab.path}
             to={tab.path}
-            className={`px-6 py-2 rounded border-2 border-pixelYellow text-pixelYellow font-pixel text-lg tracking-widest transition-all duration-150 hover:bg-pixelYellow hover:text-pixelGray ${location.pathname === tab.path ? 'bg-pixelYellow text-pixelGray' : ''}`}
+            className={`px-6 py-2 rounded border-2 border-pixelYellow text-pixelYellow font-pixel text-lg tracking-widest transition-all duration-150 hover:bg-pixelYellow hover:text-pixelGray btn-pixel ${location.pathname === tab.path ? 'bg-pixelYellow text-pixelGray' : ''}`}
           >
             {tab.name}
           </Link>
@@ -39,7 +41,7 @@ function PixelNavbar() {
       </div>
       <button 
         onClick={handleLogout} 
-        className="px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all"
+        className="px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all btn-pixel"
       >
         Logout
       </button>
@@ -67,6 +69,7 @@ export default function App() {
           <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="/customize" element={<RequireAuth><CustomizeCharacter /></RequireAuth>} />
+          <Route path="/studypods" element={<RequireAuth><Timer /></RequireAuth>} />
         </Routes>
       </main>
     </div>

@@ -12,3 +12,27 @@ body {
   /* Removed static pixel star background, now handled by React component */
   background: none;
 }
+
+.btn-pixel {
+  transition: transform 0.08s cubic-bezier(.4,2,.6,1), box-shadow 0.08s, background 0.12s;
+  box-shadow: 0 2px 0 #000, 0 0 8px #0008;
+  will-change: transform;
+}
+.btn-pixel:active {
+  transform: scale(0.96) translateY(2px);
+  box-shadow: 0 1px 0 #000, 0 0 4px #0006;
+  filter: brightness(0.95);
+}
+.btn-pixel:hover {
+  filter: brightness(1.08);
+}
+
+@keyframes fade-in-out {
+  0% { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  10% { opacity: 1; transform: translateY(0) scale(1); }
+  90% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(0.98); }
+}
+.animate-fade-in-out {
+  animation: fade-in-out 5s cubic-bezier(.4,0,.2,1) both;
+}
