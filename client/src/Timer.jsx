@@ -213,11 +213,8 @@ export default function Timer({ onSessionUpdate }) {
           alt="Character Portrait" 
           className="w-24 h-32 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray/80 backdrop-blur-sm" 
         />
-        <div className="mt-2 px-3 py-1 bg-pixelGray/80 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-xs text-pixelYellow text-center">
-          {theme.name}
-        </div>
         {profile.username && (
-          <div className="mt-1 px-3 py-1 bg-pixelGray/80 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-xs text-pixelYellow text-center">
+          <div className="mt-3 px-4 py-1 bg-pixelGray/90 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-base text-pixelYellow text-center shadow-pixel">
             @{profile.username}
           </div>
         )}
