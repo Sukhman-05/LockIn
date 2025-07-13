@@ -20,7 +20,7 @@ const BAR_COLORS = {
 
 export default function PixelBar({ type = 'xp', value = 0, max = 100 }) {
   const { fill, border, text, label, glow } = BAR_COLORS[type] || BAR_COLORS.xp;
-  const percent = Math.max(0, Math.min(100, (value / max) * 100));
+  const percent = type === 'hp' ? 100 : Math.max(0, Math.min(100, (value / max) * 100));
   // Pixel steps: 10 blocks
   const blocks = 10;
   const filledBlocks = Math.round((percent / 100) * blocks);
@@ -33,7 +33,7 @@ export default function PixelBar({ type = 'xp', value = 0, max = 100 }) {
         {[...Array(blocks)].map((_, i) => (
           <div
             key={i}
-            className={`flex-1 h-full mx-0.5 ${type === 'hp' ? 'bg-pixelRed' : (i < filledBlocks ? fill : 'bg-pixelGray')} ${glow} rounded-none border-l-2 border-black last:border-r-2 last:border-black`}
+            className={`flex-1 h-full mx-0.5 ${fill} ${glow} rounded-none border-l-2 border-black last:border-r-2 last:border-black`}
             style={{ minWidth: 0 }}
           />
         ))}

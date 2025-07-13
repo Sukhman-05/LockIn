@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Profile from './components/Profile';
 import CustomizeCharacter from './components/CustomizeCharacter';
 import { useAuth } from './AuthContext';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 
 const tabs = [
   { name: 'Dashboard', path: '/' },
@@ -14,8 +16,10 @@ const tabs = [
 function PixelNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   
+  if (!user) return null;
+
   const handleLogout = () => {
     logout(() => navigate('/signin'));
   };
@@ -43,15 +47,26 @@ function PixelNavbar() {
   );
 }
 
+function RequireAuth({ children }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  if (!user) {
+    return <Navigate to="/signin" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
 export default function App() {
   return (
     <div className="min-h-screen bg-pixelDark flex flex-col font-pixel">
       <PixelNavbar />
       <main className="flex-1 flex flex-col items-center justify-start py-8 px-2">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/customize" element={<CustomizeCharacter />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+          <Route path="/customize" element={<RequireAuth><CustomizeCharacter /></RequireAuth>} />
         </Routes>
       </main>
     </div>
