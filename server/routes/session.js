@@ -2,6 +2,7 @@ const express = require('express');
 const Session = require('../models/Session');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sessionValidation, validate } = require('../middleware/validation');
 
 const router = express.Router();
 
@@ -19,29 +20,24 @@ function auth(req, res, next) {
 }
 
 // Save a session
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, sessionValidation, validate, async (req, res) => {
   try {
-    const { start, end, duration, type } = req.body;
     const session = new Session({
-      user: req.user,
-      start,
-      end,
-      duration,
-      type,
+      ...req.body,
+      user: req.user
     });
     await session.save();
-    // Award XP for focus sessions
-    if (type === 'focus') {
+    
+    // Update user stats
       const user = await User.findById(req.user);
-      user.xp += 10;
-      // Level up for every 100 XP
-      if (user.xp >= user.level * 100) {
-        user.level += 1;
-      }
+    if (req.body.type === 'focus') {
+      await user.addXP(Math.floor(req.body.duration / 60)); // 1 XP per minute
+      await user.updateStreak();
+      user.totalFocusTime += req.body.duration;
       await user.save();
-      return res.status(201).json({ session, user: { xp: user.xp, level: user.level } });
     }
-    res.status(201).json({ session });
+    
+    res.status(201).json(session);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -52,6 +48,39 @@ router.get('/', auth, async (req, res) => {
   try {
     const sessions = await Session.find({ user: req.user }).sort({ start: -1 });
     res.json(sessions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get session statistics
+router.get('/stats', auth, async (req, res) => {
+  try {
+    const sessions = await Session.find({ 
+      user: req.user,
+      type: 'focus',
+      start: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Last 30 days
+    });
+
+    // Group by day
+    const dailyStats = {};
+    sessions.forEach(session => {
+      const date = session.start.toISOString().split('T')[0];
+      if (!dailyStats[date]) {
+        dailyStats[date] = { focusTime: 0, sessions: 0 };
+      }
+      dailyStats[date].focusTime += session.duration;
+      dailyStats[date].sessions += 1;
+    });
+
+    // Convert to array and sort
+    const daily = Object.entries(dailyStats).map(([date, stats]) => ({
+      date,
+      focusTime: stats.focusTime,
+      sessions: stats.sessions
+    })).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    res.json({ daily });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

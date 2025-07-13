@@ -2,8 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { securityHeaders, apiLimiter } = require('./middleware/security');
+const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 const app = express();
+
+// Security middleware
+app.use(securityHeaders);
+app.use(apiLimiter);
+
 app.use(cors());
 app.use(express.json());
 
@@ -26,6 +33,10 @@ app.use('/api/pods', podRouter);
 app.get('/api', (req, res) => {
   res.json({ message: 'API is running' });
 });
+
+// Error handling middleware (must be last)
+app.use(notFound);
+app.use(errorHandler);
 
 // Socket.io setup
 const http = require('http');

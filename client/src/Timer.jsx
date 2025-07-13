@@ -2,13 +2,16 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
-const FOCUS_MINUTES = 25;
-const BREAK_MINUTES = 5;
+const DEFAULT_FOCUS_MINUTES = 25;
+const DEFAULT_BREAK_MINUTES = 5;
 
 function Timer({ onSessionComplete }) {
-  const [secondsLeft, setSecondsLeft] = useState(FOCUS_MINUTES * 60);
+  const [secondsLeft, setSecondsLeft] = useState(DEFAULT_FOCUS_MINUTES * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isFocus, setIsFocus] = useState(true);
+  const [focusMinutes, setFocusMinutes] = useState(DEFAULT_FOCUS_MINUTES);
+  const [breakMinutes, setBreakMinutes] = useState(DEFAULT_BREAK_MINUTES);
+  const [showSettings, setShowSettings] = useState(false);
   const intervalRef = useRef(null);
   const { user } = useAuth();
   const [message, setMessage] = useState('');
@@ -49,10 +52,10 @@ function Timer({ onSessionComplete }) {
           handleSessionComplete(isFocus);
           if (isFocus) {
             setIsFocus(false);
-            return BREAK_MINUTES * 60;
+            return breakMinutes * 60;
           } else {
             setIsFocus(true);
-            return FOCUS_MINUTES * 60;
+            return focusMinutes * 60;
           }
         }
         return prev - 1;
@@ -69,16 +72,16 @@ function Timer({ onSessionComplete }) {
     setIsRunning(false);
     clearInterval(intervalRef.current);
     setIsFocus(true);
-    setSecondsLeft(FOCUS_MINUTES * 60);
+    setSecondsLeft(focusMinutes * 60);
   };
 
   const saveSession = async (isFocus) => {
     if (!user || !isFocus) return;
     const now = new Date();
     const session = {
-      start: new Date(now.getTime() - FOCUS_MINUTES * 60 * 1000),
+      start: new Date(now.getTime() - focusMinutes * 60 * 1000),
       end: now,
-      duration: FOCUS_MINUTES * 60,
+      duration: focusMinutes * 60,
       type: 'focus',
     };
     try {
@@ -145,6 +148,43 @@ function Timer({ onSessionComplete }) {
               {isRunning ? 'Active' : 'Ready'}
             </div>
           </div>
+          
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="mt-4 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            ⚙️ Settings
+          </button>
+          
+          {showSettings && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-900 mb-3">Timer Settings</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Focus Duration (minutes)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="120"
+                    value={focusMinutes}
+                    onChange={(e) => setFocusMinutes(parseInt(e.target.value) || DEFAULT_FOCUS_MINUTES)}
+                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Break Duration (minutes)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="30"
+                    value={breakMinutes}
+                    onChange={(e) => setBreakMinutes(parseInt(e.target.value) || DEFAULT_BREAK_MINUTES)}
+                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
