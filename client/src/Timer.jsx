@@ -248,10 +248,10 @@ export default function Timer({ onSessionUpdate }) {
             </div>
           </div>
         </div>
-        {/* Middle Row: Tasks & Timer */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full">
+        {/* Middle Row: Tasks Only */}
+        <div className="flex flex-col w-full">
           {/* Task List */}
-          <div className="w-full md:w-1/2 bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 md:p-6 flex flex-col items-center">
+          <div className="w-full bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 md:p-6 flex flex-col items-center">
             <div className="flex items-center justify-between mb-2 w-full">
               <h3 className="text-pixelYellow font-pixel text-sm md:text-base">Tasks ({tasks.length})</h3>
               <div className="text-pixelYellow/60 font-pixel text-xs md:text-sm">
@@ -303,8 +303,10 @@ export default function Timer({ onSessionUpdate }) {
               )}
             </ul>
           </div>
-          {/* Timer */}
-          <div className="w-full md:w-1/2 bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 md:p-6 flex flex-col items-center">
+        </div>
+        {/* Timer Row */}
+        <div className="flex flex-col w-full">
+          <div className="w-full bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 md:p-6 flex flex-col items-center mt-4">
             {feedback && (
               <div className="mb-4 w-full bg-pixelYellow text-pixelGray border-2 border-pixelOrange px-4 py-2 rounded font-pixel text-center animate-pulse text-sm md:text-base">
                 {feedback}

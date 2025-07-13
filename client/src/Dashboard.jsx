@@ -75,73 +75,73 @@ export default function Dashboard() {
   const portrait = profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png';
 
   return (
-    <div className="flex flex-col items-center w-full max-w-4xl mx-auto gap-8 relative">
+    <div className="flex flex-col items-center w-full max-w-3xl mx-auto gap-8 relative px-2 md:px-0">
       {/* XP Help */}
       <button onClick={() => setShowXPHelp(true)} className="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-pixelYellow border-2 border-pixelOrange rounded-full shadow-pixel text-pixelGray text-2xl font-bold z-10" title="How to gain XP?">?</button>
       <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
-      
       {/* Main Title */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-pixel text-pixelYellow mb-2" style={{ textShadow: '0 0 8px #ffe066, 0 0 2px #fff' }}>
+      <div className="text-center mb-4 md:mb-8">
+        <h1 className="text-3xl md:text-4xl font-pixel text-pixelYellow mb-2" style={{ textShadow: '0 0 8px #ffe066, 0 0 2px #fff' }}>
           Let's Lock IN
         </h1>
       </div>
-      
-      {/* Portrait and Stats Section */}
-      <div className="flex items-start gap-8 w-full max-w-2xl">
+      {/* Top Row: Avatar, Stats, Calendar */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full">
         {/* User Portrait */}
-        <div className="flex-shrink-0">
-          <img src={portrait} alt="User Portrait" className="w-40 h-56 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray" />
+        <div className="flex flex-col items-center bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 min-w-0 w-full md:max-w-xs flex-1">
+          <img src={portrait} alt="User Portrait" className="w-24 h-32 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray" />
         </div>
-        
-        {/* HP and XP Bars */}
-        <div className="flex flex-col gap-4 flex-1">
+        {/* Stats */}
+        <div className="flex flex-col items-center justify-center bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 flex-1 min-w-0 w-full">
           <div className="text-center mb-2">
-            <h2 className="text-xl text-pixelYellow font-pixel">@{profile.username}</h2>
+            <h2 className="text-lg md:text-xl text-pixelYellow font-pixel">@{profile.username}</h2>
           </div>
           <PixelBar type="hp" value={profile.hp} max={100} />
           <PixelBar type="xp" value={profile.xp} max={profile.xpMax} />
-          
           {/* Stats */}
-          <div className="flex gap-4 justify-center mt-4">
-            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Level {profile.level}</div>
-            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">HP {profile.hp}/100</div>
-            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">XP {profile.xp}/{profile.xpMax}</div>
+          <div className="flex flex-col gap-2 w-full items-center mt-2">
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-2 md:px-3 py-1 font-pixel text-pixelYellow text-xs w-full text-center">Level {profile.level}</div>
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-2 md:px-3 py-1 font-pixel text-pixelYellow text-xs w-full text-center">HP {profile.hp}/100</div>
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-2 md:px-3 py-1 font-pixel text-pixelYellow text-xs w-full text-center">XP {profile.xp}/{profile.xpMax}</div>
           </div>
           {profile.streak && (
-            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs text-center">
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs text-center mt-2">
               🔥 {profile.streak} Day Streak!
             </div>
           )}
         </div>
+        {/* Streak Calendar */}
+        <div className="flex flex-col items-center justify-center bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 flex-1 min-w-0 w-full overflow-x-auto">
+          <div className="w-full max-w-xs md:max-w-none">
+            <PixelStreakCalendar streakHistory={streakHistory} />
+          </div>
+        </div>
       </div>
-      
       {/* Quick Actions */}
-      <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+      <div className="flex flex-col md:flex-row items-center gap-4 w-full max-w-2xl mx-auto mt-2 md:mt-4">
         <button 
           onClick={() => navigate('/studypods')} 
-          className="w-full py-4 bg-pixelGreen text-pixelGray border-4 border-pixelYellow rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+          className="w-full md:w-auto py-4 px-4 bg-pixelGreen text-pixelGray border-4 border-pixelYellow rounded-lg font-pixel text-lg md:text-xl shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
         >
           Start Study Session
         </button>
-        <div className="flex gap-4 w-full">
+        <div className="flex gap-4 w-full md:w-auto">
           <button 
             onClick={() => navigate('/profile')} 
-            className="flex-1 py-3 bg-pixelBlue text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+            className="flex-1 py-3 bg-pixelBlue text-white border-2 border-pixelYellow rounded font-pixel text-base md:text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
           >
             Profile
           </button>
           <button 
             onClick={() => navigate('/customize')} 
-            className="flex-1 py-3 bg-pixelPurple text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+            className="flex-1 py-3 bg-pixelPurple text-white border-2 border-pixelYellow rounded font-pixel text-base md:text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
           >
             Customize
           </button>
         </div>
       </div>
-      
-      {/* Streak Calendar */}
-      <PixelStreakCalendar streakHistory={streakHistory} />
+      {/* Streak Calendar Label */}
+      <div className="text-xs text-pixelYellow mt-2 md:mt-4 text-center">Each square = 1 day. Green = focus day.</div>
     </div>
   );
 } 
