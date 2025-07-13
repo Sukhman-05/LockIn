@@ -4,6 +4,7 @@ import Dashboard from './Dashboard';
 import Profile from './components/Profile';
 import CustomizeCharacter from './components/CustomizeCharacter';
 import { useAuth } from './AuthContext';
+import { useMusic } from './MusicContext';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Timer from './Timer';
@@ -19,6 +20,7 @@ function PixelNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const { muted, toggleMute } = useMusic();
   
   if (!user) return null;
 
@@ -39,12 +41,22 @@ function PixelNavbar() {
           </Link>
         ))}
       </div>
-      <button 
-        onClick={handleLogout} 
-        className="px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all btn-pixel"
-      >
-        Logout
-      </button>
+      <div className="flex items-center gap-4">
+        {/* Global Music Control */}
+        <button 
+          onClick={toggleMute} 
+          className="w-10 h-10 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded-full shadow-pixel text-pixelYellow text-xl font-bold btn-pixel" 
+          title={muted ? 'Unmute music' : 'Mute music'}
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
+        <button 
+          onClick={handleLogout} 
+          className="px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all btn-pixel"
+        >
+          Logout
+        </button>
+      </div>
     </nav>
   );
 }

@@ -39,7 +39,6 @@ export default function Dashboard() {
   const [streakHistory, setStreakHistory] = useState([]);
   const [showXPHelp, setShowXPHelp] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [showWelcome, setShowWelcome] = useState(() => {
     return sessionStorage.getItem('welcomeShown') !== 'true';
   });
@@ -93,23 +92,6 @@ export default function Dashboard() {
     return () => { document.head.removeChild(style); };
   }, []);
 
-  // Soundtrack
-  useEffect(() => {
-    let audio = document.getElementById('bg-music');
-    if (!audio) {
-      audio = document.createElement('audio');
-      audio.id = 'bg-music';
-      audio.src = '/music.mp3';
-      audio.loop = true;
-      audio.volume = muted ? 0 : 0.2;
-      document.body.appendChild(audio);
-    } else {
-      audio.volume = muted ? 0 : 0.2;
-    }
-    audio.play().catch(() => {});
-    return () => { audio.pause(); };
-  }, [muted]);
-
   // HP bar animation
   const hpPercent = Math.max(0, Math.min(100, profile.hp));
 
@@ -127,30 +109,51 @@ export default function Dashboard() {
       {/* XP Help */}
       <button onClick={() => setShowXPHelp(true)} className="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-pixelYellow border-2 border-pixelOrange rounded-full shadow-pixel text-pixelGray text-2xl font-bold z-10" title="How to gain XP?">?</button>
       <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
-      {/* Mute/unmute soundtrack */}
-      <button onClick={() => setMuted(m => !m)} className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded-full shadow-pixel text-pixelYellow text-xl font-bold z-10" title={muted ? 'Unmute music' : 'Mute music'}>
-        {muted ? '🔇' : '🔊'}
-      </button>
       {/* User Portrait */}
       <div className="flex items-center justify-center my-4">
         <img src={portrait} alt="User Portrait" className="w-40 h-56 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray" />
       </div>
       {/* HP and XP Bars */}
       <div className="flex flex-col items-center gap-2 w-full">
-        <div className="flex items-center gap-4 mb-1">
-          <span className="text-pixelYellow text-lg">LEVEL</span>
-          <span className="text-pixelPurple text-2xl">{profile.level}</span>
-        </div>
-        <PixelBar type="xp" value={profile.xp} max={profile.xpMax || 100} />
         <PixelBar type="hp" value={profile.hp} max={100} />
+        <PixelBar type="xp" value={profile.xp} max={profile.xpMax} />
       </div>
-      {/* Study Pods Button (idle animation) */}
-      <button
-        className="px-10 py-4 bg-pixelYellow text-pixelGray border-4 border-pixelOrange rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelOrange hover:text-white transition-all animate-bounce-slow btn-pixel"
-        onClick={() => navigate('/studypods')}
-      >
-        Study Pods
-      </button>
+      {/* Stats */}
+      <div className="flex flex-col items-center gap-4 w-full">
+        <div className="flex gap-4 justify-center">
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Level {profile.level}</div>
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">HP {profile.hp}/100</div>
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">XP {profile.xp}/{profile.xpMax}</div>
+        </div>
+        {profile.streak && (
+          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">
+            🔥 {profile.streak} Day Streak!
+          </div>
+        )}
+      </div>
+      {/* Quick Actions */}
+      <div className="flex flex-col items-center gap-4 w-full">
+        <button 
+          onClick={() => navigate('/studypods')} 
+          className="w-full max-w-sm py-4 bg-pixelGreen text-pixelGray border-4 border-pixelYellow rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+        >
+          Start Study Session
+        </button>
+        <div className="flex gap-4 w-full max-w-sm">
+          <button 
+            onClick={() => navigate('/profile')} 
+            className="flex-1 py-3 bg-pixelBlue text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+          >
+            Profile
+          </button>
+          <button 
+            onClick={() => navigate('/customize')} 
+            className="flex-1 py-3 bg-pixelPurple text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+          >
+            Customize
+          </button>
+        </div>
+      </div>
       {/* Streak Calendar */}
       <PixelStreakCalendar streakHistory={streakHistory} />
     </div>

@@ -7,6 +7,28 @@ const DEFAULT_FOCUS_MINUTES = 25;
 const DEFAULT_BREAK_MINUTES = 5;
 const HP_LOSS_ON_QUIT = 10;
 
+// Character themes for dynamic backgrounds
+const CHARACTER_THEMES = {
+  '/Character1.png': {
+    name: 'Valiant Knight',
+    background: 'linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b4423 100%)',
+    accent: '#d4af37',
+    stars: ['#fff', '#ffe066', '#d4af37']
+  },
+  '/Character2.png': {
+    name: 'Arcane Sorceress', 
+    background: 'linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 50%, #4a2c7a 100%)',
+    accent: '#a259f7',
+    stars: ['#fff', '#a259f7', '#b3e6ff', '#e6b3ff']
+  },
+  '/Character3.png': {
+    name: 'Nimble Rogue',
+    background: 'linear-gradient(135deg, #0f2e1a 0%, #1b4e2d 50%, #2c7a4a 100%)',
+    accent: '#4ade80',
+    stars: ['#fff', '#4ade80', '#22c55e', '#86efac']
+  }
+};
+
 function playSound(url) {
   const audio = new window.Audio(url);
   audio.volume = 0.3;
@@ -24,16 +46,27 @@ export default function Timer({ onSessionUpdate }) {
   const [stats, setStats] = useState({ totalFocus: 0, sessions: 0, streak: 0 });
   const [tasks, setTasks] = useState([]);
   const [taskInput, setTaskInput] = useState('');
+  const [profile, setProfile] = useState({});
   const intervalRef = useRef(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Get portrait and theme
+  const portrait = profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png';
+  const theme = CHARACTER_THEMES[portrait] || CHARACTER_THEMES['/Character1.png'];
 
   useEffect(() => {
     setSecondsLeft(isFocus ? focusMinutes * 60 : breakMinutes * 60);
   }, [focusMinutes, breakMinutes, isFocus]);
 
   useEffect(() => {
-    // Fetch stats from backend
+    // Fetch profile and stats from backend
+    async function fetchProfile() {
+      try {
+        const res = await axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${user?.token}` } });
+        setProfile(res.data);
+      } catch {}
+    }
     async function fetchStats() {
       try {
         const res = await axios.get('/api/sessions/stats', {
@@ -46,8 +79,36 @@ export default function Timer({ onSessionUpdate }) {
         });
       } catch {}
     }
-    if (user) fetchStats();
+    if (user?.token) {
+      fetchProfile();
+      fetchStats();
+    }
   }, [user]);
+
+  // Dynamic background effect
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')} { 
+        0% { background-position: 0 0; } 
+        100% { background-position: 100px 100px; } 
+      }
+      .animate-bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')} { 
+        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+          ${theme.stars.map((color, i) => 
+            `<circle cx="${10 + i * 20}" cy="${10 + i * 15}" r="${1 + i * 0.3}" fill="${color}"/>`
+          ).join('')}
+        </svg>'); 
+        background-repeat: repeat; 
+        animation: bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')} 20s linear infinite; 
+      }`;
+    document.head.appendChild(style);
+    return () => { 
+      if (document.head.contains(style)) {
+        document.head.removeChild(style); 
+      }
+    };
+  }, [portrait, theme]);
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -148,11 +209,36 @@ export default function Timer({ onSessionUpdate }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-transparent relative">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center p-4 relative"
+      style={{ 
+        background: theme.background,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      {/* Dynamic animated stars background */}
+      <div 
+        className={`absolute inset-0 animate-bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')}`}
+        style={{ opacity: 0.3 }}
+      />
+      
       {/* Back Button */}
       <button onClick={() => navigate('/')} className="absolute top-4 left-4 px-4 py-2 bg-pixelGray text-pixelYellow border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel z-10">
         ← Back
       </button>
+      
+      {/* Character Portrait */}
+      <div className="absolute top-4 right-4 flex flex-col items-center z-10">
+        <img 
+          src={portrait} 
+          alt="Character Portrait" 
+          className="w-24 h-32 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray/80 backdrop-blur-sm" 
+        />
+        <div className="mt-2 px-3 py-1 bg-pixelGray/80 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-xs text-pixelYellow text-center">
+          {theme.name}
+        </div>
+      </div>
       {/* Stats */}
       <div className="mb-4 w-full max-w-sm flex flex-col items-center gap-2">
         <div className="flex gap-4 justify-center">
