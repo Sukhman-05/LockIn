@@ -3,6 +3,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Profile from './components/Profile';
 import CustomizeCharacter from './components/CustomizeCharacter';
+import { useAuth } from './AuthContext';
 
 const tabs = [
   { name: 'Dashboard', path: '/' },
@@ -12,8 +13,10 @@ const tabs = [
 
 function PixelNavbar() {
   const location = useLocation();
+  const { logout } = useAuth();
+  
   return (
-    <nav className="w-full flex justify-center py-4 bg-pixelGray border-b-4 border-pixelYellow shadow-pixel">
+    <nav className="w-full flex justify-between items-center py-4 px-6 bg-pixelGray border-b-4 border-pixelYellow shadow-pixel">
       <div className="flex gap-8">
         {tabs.map(tab => (
           <Link
@@ -25,6 +28,12 @@ function PixelNavbar() {
           </Link>
         ))}
       </div>
+      <button 
+        onClick={logout} 
+        className="px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all"
+      >
+        Logout
+      </button>
     </nav>
   );
 }

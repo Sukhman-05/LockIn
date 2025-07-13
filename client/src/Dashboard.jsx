@@ -4,6 +4,8 @@ import PixelStreakCalendar from './components/PixelStreakCalendar';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
 import Timer from './Timer';
+import PixelBar from './components/PixelBar';
+import AnimatedStars from './components/AnimatedStars';
 
 function getAvatar() {
   try {
@@ -11,11 +13,6 @@ function getAvatar() {
   } catch {
     return {};
   }
-}
-
-function DynamicBackground() {
-  // Animate stars with CSS keyframes
-  return <div className="fixed inset-0 -z-10 animate-bgStars" style={{ pointerEvents: 'none' }} />;
 }
 
 function XPHelpModal({ open, onClose }) {
@@ -87,7 +84,8 @@ export default function Dashboard() {
     if (!audio) {
       audio = document.createElement('audio');
       audio.id = 'bg-music';
-      audio.src = 'https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae5b2.mp3'; // Free chiptune loop
+      
+      audio.src = '/your-music.mp3'; // Uncomment and replace with your music file
       audio.loop = true;
       audio.volume = muted ? 0 : 0.2;
       document.body.appendChild(audio);
@@ -103,14 +101,12 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col items-center w-full max-w-2xl mx-auto gap-8 relative">
-      <DynamicBackground />
-      {/* Logout button */}
-      <button onClick={logout} className="absolute top-2 right-2 px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all z-10">Logout</button>
+      <AnimatedStars />
       {/* XP Help */}
       <button onClick={() => setShowXPHelp(true)} className="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-pixelYellow border-2 border-pixelOrange rounded-full shadow-pixel text-pixelGray text-2xl font-bold z-10" title="How to gain XP?">?</button>
       <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
       {/* Mute/unmute soundtrack */}
-      <button onClick={() => setMuted(m => !m)} className="absolute top-2 right-20 w-10 h-10 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded-full shadow-pixel text-pixelYellow text-xl font-bold z-10" title={muted ? 'Unmute music' : 'Mute music'}>
+      <button onClick={() => setMuted(m => !m)} className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded-full shadow-pixel text-pixelYellow text-xl font-bold z-10" title={muted ? 'Unmute music' : 'Mute music'}>
         {muted ? '🔇' : '🔊'}
       </button>
       {/* Character (bobbing idle animation) */}
@@ -123,18 +119,8 @@ export default function Dashboard() {
           <span className="text-pixelYellow text-lg">LEVEL</span>
           <span className="text-pixelPurple text-2xl">{profile.level}</span>
         </div>
-        <div className="w-64 h-6 bg-pixelGray border-2 border-pixelYellow rounded flex items-center relative mb-2">
-          <div className="h-full bg-pixelGreen rounded transition-all duration-500" style={{ width: `${(profile.xp / (profile.xpMax || 100)) * 100}%` }} />
-          <span className="absolute left-1/2 -translate-x-1/2 text-pixelYellow text-xs font-pixel">
-            XP: {profile.xp} / {profile.xpMax || 100}
-          </span>
-        </div>
-        <div className="w-64 h-6 bg-pixelGray border-2 border-pixelRed rounded flex items-center relative">
-          <div className="h-full bg-pixelRed rounded transition-all duration-500" style={{ width: `${hpPercent}%` }} />
-          <span className="absolute left-1/2 -translate-x-1/2 text-white text-xs font-pixel">
-            HP: {profile.hp} / 100
-          </span>
-        </div>
+        <PixelBar type="xp" value={profile.xp} max={profile.xpMax || 100} />
+        <PixelBar type="hp" value={profile.hp} max={100} />
       </div>
       {/* Study Pods Button (idle animation) */}
       <button
