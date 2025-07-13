@@ -224,6 +224,11 @@ export default function Timer({ onSessionUpdate }) {
         <div className="mt-2 px-3 py-1 bg-pixelGray/80 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-xs text-pixelYellow text-center">
           {theme.name}
         </div>
+        {profile.username && (
+          <div className="mt-1 px-3 py-1 bg-pixelGray/80 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-xs text-pixelYellow text-center">
+            @{profile.username}
+          </div>
+        )}
       </div>
       {/* Stats */}
       <div className="mb-4 w-full max-w-sm flex flex-col items-center gap-2">

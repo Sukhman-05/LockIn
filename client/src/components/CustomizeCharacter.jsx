@@ -27,25 +27,46 @@ export default function CustomizeCharacter() {
   });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const current = PORTRAITS.find(p => p.img === selected) || PORTRAITS[0];
 
   const handleSelect = (img) => {
     setSelected(img);
     localStorage.setItem('selectedPortrait', img);
+    setError(''); // Clear any previous errors
   };
 
   const handleConfirm = async () => {
+    if (!user?.token) {
+      setError('You must be logged in to save your portrait.');
+      return;
+    }
+
     setError('');
     setSuccess(false);
+    setIsLoading(true);
+
     try {
-      await axios.patch('/api/auth/me', { portrait: selected }, {
-        headers: { Authorization: `Bearer ${user?.token}` }
-      });
+      console.log('Saving portrait:', selected);
+      const response = await axios.patch('/api/auth/me', 
+        { portrait: selected }, 
+        { 
+          headers: { 
+            Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'application/json'
+          } 
+        }
+      );
+      
+      console.log('Portrait save response:', response.data);
       setSuccess(true);
       localStorage.setItem('selectedPortrait', selected);
-      setTimeout(() => setSuccess(false), 2000);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError('Failed to save portrait.');
+      console.error('Portrait save error:', err);
+      setError(err.response?.data?.error || 'Failed to save portrait. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,9 +100,23 @@ export default function CustomizeCharacter() {
           </div>
         </div>
       </div>
-      <button className="mt-10 px-10 py-3 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel" onClick={handleConfirm}>Confirm</button>
-      {success && <div className="mt-4 text-pixelGreen font-pixel text-base">Portrait saved!</div>}
-      {error && <div className="mt-4 text-pixelRed font-pixel text-base">{error}</div>}
+      <button 
+        className={`mt-10 px-10 py-3 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`} 
+        onClick={handleConfirm}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Saving...' : 'Confirm'}
+      </button>
+      {success && (
+        <div className="mt-4 text-pixelGreen font-pixel text-base bg-pixelGray border-2 border-pixelGreen rounded px-4 py-2">
+          ✓ Portrait saved successfully!
+        </div>
+      )}
+      {error && (
+        <div className="mt-4 text-pixelRed font-pixel text-base bg-pixelGray border-2 border-pixelRed rounded px-4 py-2">
+          ✗ {error}
+        </div>
+      )}
     </div>
   );
 } 

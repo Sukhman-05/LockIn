@@ -6,7 +6,6 @@ import { useAuth } from './AuthContext';
 import axios from 'axios';
 import Timer from './Timer';
 import PixelBar from './components/PixelBar';
-import AnimatedStars from './components/AnimatedStars';
 
 function getAvatar() {
   try {
@@ -77,7 +76,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col items-center w-full max-w-4xl mx-auto gap-8 relative">
-      <AnimatedStars />
       {/* XP Help */}
       <button onClick={() => setShowXPHelp(true)} className="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-pixelYellow border-2 border-pixelOrange rounded-full shadow-pixel text-pixelGray text-2xl font-bold z-10" title="How to gain XP?">?</button>
       <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
