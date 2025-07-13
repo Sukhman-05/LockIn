@@ -140,7 +140,7 @@ export default function Dashboard() {
         </button>
       </div>
       {/* Streak Calendar Label */}
-      <div className="text-xs text-pixelYellow mt-2 md:mt-4 text-center">Each square = 1 day. Green = focus day.</div>
+      <div className="text-xs text-pixelYellow mt-2 md:mt-4 text-center">Each square = 1 session. Green = completed session.</div>
     </div>
   );
 } 
