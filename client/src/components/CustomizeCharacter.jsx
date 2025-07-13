@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../utils/api';
 import { useAuth } from '../AuthContext';
+import { useBackground } from '../BackgroundContext';
 
 const PORTRAITS = [
   {
@@ -22,6 +23,7 @@ const PORTRAITS = [
 
 export default function CustomizeCharacter() {
   const { user } = useAuth();
+  const { setPortrait } = useBackground();
   const [selected, setSelected] = useState(() => {
     return localStorage.getItem('selectedPortrait') || PORTRAITS[0].img;
   });
@@ -33,7 +35,8 @@ export default function CustomizeCharacter() {
   const handleSelect = (img) => {
     setSelected(img);
     localStorage.setItem('selectedPortrait', img);
-    setError(''); // Clear any previous errors
+    setError('');
+    setSuccess(false);
   };
 
   const handleConfirm = async () => {
@@ -53,6 +56,7 @@ export default function CustomizeCharacter() {
       console.log('Portrait save response:', response.data);
       setSuccess(true);
       localStorage.setItem('selectedPortrait', selected);
+      setPortrait(selected);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Portrait save error:', err);

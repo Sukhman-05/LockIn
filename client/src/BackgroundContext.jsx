@@ -34,9 +34,9 @@ export function BackgroundProvider({ children }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState({});
   const [currentTheme, setCurrentTheme] = useState(CHARACTER_THEMES['/Character1.png']);
-
-  // Get portrait and theme
-  const portrait = profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png';
+  const [portrait, setPortrait] = useState(
+    profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png'
+  );
   const theme = CHARACTER_THEMES[portrait] || CHARACTER_THEMES['/Character1.png'];
 
   useEffect(() => {
@@ -99,6 +99,7 @@ export function BackgroundProvider({ children }) {
   const value = {
     currentTheme,
     portrait,
+    setPortrait,
     CHARACTER_THEMES
   };
 
