@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from './utils/api';
 import { useAuth } from './AuthContext';
 
 const DEFAULT_FOCUS_MINUTES = 25;
@@ -63,15 +63,13 @@ export default function Timer({ onSessionUpdate }) {
     // Fetch profile and stats from backend
     async function fetchProfile() {
       try {
-        const res = await axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${user?.token}` } });
+        const res = await api.get('/auth/me');
         setProfile(res.data);
       } catch {}
     }
     async function fetchStats() {
       try {
-        const res = await axios.get('/api/sessions/stats', {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
+        const res = await api.get('/sessions/stats');
         setStats({
           totalFocus: res.data.totalFocusTime || 0,
           sessions: res.data.totalSessions || 0,
@@ -84,8 +82,6 @@ export default function Timer({ onSessionUpdate }) {
       fetchStats();
     }
   }, [user]);
-
-
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -128,9 +124,7 @@ export default function Timer({ onSessionUpdate }) {
       setFeedback('-10 HP (quit early!)');
       playSound('https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b1b2b2.mp3'); // fail sound
       try {
-        await axios.patch('/api/sessions/hp', { loss: HP_LOSS_ON_QUIT }, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        await api.patch('/sessions/hp', { loss: HP_LOSS_ON_QUIT });
         if (onSessionUpdate) onSessionUpdate();
       } catch {}
     }
@@ -152,9 +146,7 @@ export default function Timer({ onSessionUpdate }) {
       type: 'focus',
     };
     try {
-      await axios.post('/api/sessions', session, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await api.post('/sessions', session);
       setFeedback(`+${focusMinutes} XP!`);
       if (onSessionUpdate) onSessionUpdate();
     } catch {}

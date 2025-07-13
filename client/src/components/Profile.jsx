@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext';
-import axios from 'axios';
+import api from '../utils/api';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -10,7 +10,7 @@ export default function Profile() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${user?.token}` } });
+        const res = await api.get('/auth/me');
         setProfile(res.data);
       } catch {
         setProfile(null);
@@ -55,7 +55,7 @@ export default function Profile() {
           </div>
           <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
             <div className="text-pixelYellow text-xs font-pixel">HP</div>
-            <div className="text-white text-xl font-pixel">{profile.hp}/100</div>
+            <div className="text-white text-xl font-pixel">{profile.hp}</div>
           </div>
           <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
             <div className="text-pixelYellow text-xs font-pixel">Streak</div>

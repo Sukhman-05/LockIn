@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PixelAvatar from './components/PixelAvatar';
 import PixelStreakCalendar from './components/PixelStreakCalendar';
 import { useAuth } from './AuthContext';
-import axios from 'axios';
+import api from './utils/api';
 import Timer from './Timer';
 import PixelBar from './components/PixelBar';
 
@@ -44,13 +44,13 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${user?.token}` } });
+        const res = await api.get('/auth/me');
         setProfile(p => ({ ...p, ...res.data }));
       } catch {}
     }
     async function fetchStreak() {
       try {
-        const res = await axios.get('/api/sessions/streak', { headers: { Authorization: `Bearer ${user?.token}` } });
+        const res = await api.get('/sessions/streak');
         setProfile(p => ({ ...p, streak: res.data.streak }));
         setStreakHistory(res.data.streakHistory || []);
       } catch {}

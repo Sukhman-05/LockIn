@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../AuthContext';
 
 const PORTRAITS = [
@@ -48,16 +48,7 @@ export default function CustomizeCharacter() {
 
     try {
       console.log('Saving portrait:', selected);
-      const API = import.meta.env.VITE_API_BASE_URL;
-      const response = await axios.patch(`${API}/auth/me`, 
-        { portrait: selected }, 
-        { 
-          headers: { 
-            Authorization: `Bearer ${user.token}`,
-            'Content-Type': 'application/json'
-          } 
-        }
-      );
+      const response = await api.patch('/auth/me', { portrait: selected });
       
       console.log('Portrait save response:', response.data);
       setSuccess(true);
