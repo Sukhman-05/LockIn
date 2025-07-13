@@ -1,39 +1,32 @@
 import React from 'react';
 
-function getRecentDays(n = 42) {
-  const days = [];
-  const today = new Date();
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    d.setHours(0, 0, 0, 0);
-    days.push(d);
-  }
-  return days;
-}
-
-export default function PixelStreakCalendar({ streakHistory = [] }) {
-  // streakHistory: array of ISO date strings
-  const streakSet = new Set(streakHistory.map(d => new Date(d).toDateString()));
-  const days = getRecentDays(42);
+export default function PixelStreakCalendar({ totalSessions = 0, sessionMilestone = false }) {
+  // 30 session boxes
+  const boxes = 30;
   return (
     <div className="flex flex-col items-center">
-      <div className="text-pixelYellow text-sm mb-2">Streak Calendar</div>
-      <div className="grid grid-cols-7 gap-1 bg-pixelGray p-2 border-4 border-pixelYellow rounded-lg shadow-pixel">
-        {days.map((date, i) => {
-          const focused = streakSet.has(date.toDateString());
+      <div className="text-pixelYellow text-sm mb-2">Session Calendar</div>
+      <div className="grid grid-cols-6 gap-1 bg-pixelGray p-2 border-4 border-pixelYellow rounded-lg shadow-pixel">
+        {[...Array(boxes)].map((_, i) => {
+          const filled = i < totalSessions;
           return (
             <div
               key={i}
-              className={`w-6 h-6 rounded-sm border-2 ${focused ? 'bg-pixelGreen border-pixelYellow animate-pulse-slow' : 'bg-pixelGray border-pixelGray'} flex items-center justify-center`}
-              title={focused ? `Focus day: ${date.toLocaleDateString()}` : `Missed day: ${date.toLocaleDateString()}`}
+              className={`w-6 h-6 rounded-sm border-2 flex items-center justify-center transition-all duration-300
+                ${filled ? (sessionMilestone && i === totalSessions - 1 ? 'bg-pixelGreen border-pixelYellow animate-bounce' : 'bg-pixelGreen border-pixelYellow') : 'bg-pixelGray border-pixelGray'}`}
+              title={filled ? `Session ${i + 1} completed` : `Session ${i + 1}`}
             >
-              {focused ? <span className="text-xs text-white">★</span> : ''}
+              {filled ? <span className="text-xs text-white">★</span> : ''}
             </div>
           );
         })}
       </div>
-      <div className="text-xs text-pixelYellow mt-2">Each square = 1 day. Green = focus day.</div>
+      <div className="text-xs text-pixelYellow mt-2">Each square = 1 session. Green = completed session.</div>
+      {sessionMilestone && (
+        <div className="mt-2 text-pixelGreen font-pixel text-base bg-pixelGray border-2 border-pixelGreen rounded px-4 py-2 animate-pulse">
+          🎉 30 Sessions Complete! +50 XP
+        </div>
+      )}
     </div>
   );
 } 

@@ -25,18 +25,24 @@ export default function PixelBar({ type = 'xp', value = 0, max = 100 }) {
   const blocks = 10;
   const filledBlocks = Math.round((percent / 100) * blocks);
   return (
-    <div className={`w-64 h-8 flex items-center relative mb-2`}>
-      <span className={`absolute left-2 top-1/2 -translate-y-1/2 ${text} text-xs font-pixel z-10`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
-        {label}
-      </span>
-      <div className={`absolute left-16 right-2 top-0 bottom-0 flex gap-0.5 px-1 py-1 ${border} border-4 rounded-none bg-pixelGray`} style={{ boxShadow: '0 0 0 2px #000, 0 0 8px #0008' }}>
-        {[...Array(blocks)].map((_, i) => (
-          <div
-            key={i}
-            className={`flex-1 h-full mx-0.5 ${fill} ${glow} rounded-none border-l-2 border-black last:border-r-2 last:border-black`}
-            style={{ minWidth: 0 }}
-          />
-        ))}
+    <div className="w-64 flex flex-col items-center mb-2">
+      {/* Numeric value above bar */}
+      <div className={`mb-1 font-pixel text-xs ${text}`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
+        {label}: {value}/{max}
+      </div>
+      <div className={`w-64 h-8 flex items-center relative`}>
+        <span className={`absolute left-2 top-1/2 -translate-y-1/2 ${text} text-xs font-pixel z-10`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
+          {label}
+        </span>
+        <div className={`absolute left-16 right-2 top-0 bottom-0 flex gap-0.5 px-1 py-1 ${border} border-4 rounded-none bg-pixelGray`} style={{ boxShadow: '0 0 0 2px #000, 0 0 8px #0008' }}>
+          {[...Array(blocks)].map((_, i) => (
+            <div
+              key={i}
+              className={`flex-1 h-full mx-0.5 ${i < filledBlocks ? fill : 'bg-pixelGray'} ${i < filledBlocks ? glow : ''} rounded-none border-l-2 border-black last:border-r-2 last:border-black`}
+              style={{ minWidth: 0 }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

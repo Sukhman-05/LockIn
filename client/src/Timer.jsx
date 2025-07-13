@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from './utils/api';
 import { useAuth } from './AuthContext';
+import PixelStreakCalendar from './components/PixelStreakCalendar';
 
 const DEFAULT_FOCUS_MINUTES = 25;
 const DEFAULT_BREAK_MINUTES = 5;
@@ -47,6 +48,8 @@ export default function Timer({ onSessionUpdate }) {
   const [tasks, setTasks] = useState([]);
   const [taskInput, setTaskInput] = useState('');
   const [profile, setProfile] = useState({});
+  const [totalSessions, setTotalSessions] = useState(0);
+  const [sessionMilestone, setSessionMilestone] = useState(false);
   const intervalRef = useRef(null);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -77,9 +80,16 @@ export default function Timer({ onSessionUpdate }) {
         });
       } catch {}
     }
+    async function fetchTotalSessions() {
+      try {
+        const res = await api.get('/sessions/totalsessions');
+        setTotalSessions(res.data.totalSessions || 0);
+      } catch {}
+    }
     if (user?.token) {
       fetchProfile();
       fetchStats();
+      fetchTotalSessions();
     }
   }, [user]);
 
@@ -146,8 +156,15 @@ export default function Timer({ onSessionUpdate }) {
       type: 'focus',
     };
     try {
-      await api.post('/sessions', session);
+      const res = await api.post('/sessions', session);
       setFeedback(`+${focusMinutes} XP!`);
+      // Update totalSessions and milestone state
+      setTotalSessions(res.data.totalSessions);
+      setSessionMilestone(!!res.data.sessionMilestone);
+      if (res.data.sessionMilestone) {
+        setFeedback('+50 XP! 30 Sessions Complete!');
+        setTimeout(() => setSessionMilestone(false), 4000);
+      }
       if (onSessionUpdate) onSessionUpdate();
     } catch {}
   };
@@ -206,18 +223,18 @@ export default function Timer({ onSessionUpdate }) {
         ← Back
       </button>
       
-      {/* Character Portrait */}
-      <div className="absolute top-4 right-4 flex flex-col items-center z-10">
+      {/* Character Portrait and Username */}
+      <div className="absolute top-4 right-4 flex items-center gap-3 z-10">
+        {profile.username && (
+          <div className="px-4 py-1 bg-pixelGray/90 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-base text-pixelYellow text-center shadow-pixel">
+            @{profile.username}
+          </div>
+        )}
         <img 
           src={portrait} 
           alt="Character Portrait" 
           className="w-24 h-32 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray/80 backdrop-blur-sm" 
         />
-        {profile.username && (
-          <div className="mt-3 px-4 py-1 bg-pixelGray/90 backdrop-blur-sm border-2 border-pixelYellow rounded font-pixel text-base text-pixelYellow text-center shadow-pixel">
-            @{profile.username}
-          </div>
-        )}
       </div>
       {/* Stats */}
       <div className="mb-4 w-full max-w-sm flex flex-col items-center gap-2">
@@ -358,6 +375,10 @@ export default function Timer({ onSessionUpdate }) {
             </div>
           )}
         </div>
+      </div>
+      {/* Session Calendar */}
+      <div className="my-8">
+        <PixelStreakCalendar totalSessions={totalSessions} sessionMilestone={sessionMilestone} />
       </div>
     </div>
   );
