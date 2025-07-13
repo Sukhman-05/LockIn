@@ -85,30 +85,7 @@ export default function Timer({ onSessionUpdate }) {
     }
   }, [user]);
 
-  // Dynamic background effect
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @keyframes bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')} { 
-        0% { background-position: 0 0; } 
-        100% { background-position: 100px 100px; } 
-      }
-      .animate-bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')} { 
-        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-          ${theme.stars.map((color, i) => 
-            `<circle cx="${10 + i * 20}" cy="${10 + i * 15}" r="${1 + i * 0.3}" fill="${color}"/>`
-          ).join('')}
-        </svg>'); 
-        background-repeat: repeat; 
-        animation: bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')} 20s linear infinite; 
-      }`;
-    document.head.appendChild(style);
-    return () => { 
-      if (document.head.contains(style)) {
-        document.head.removeChild(style); 
-      }
-    };
-  }, [portrait, theme]);
+
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -196,32 +173,41 @@ export default function Timer({ onSessionUpdate }) {
 
   // Task logic
   const addTask = () => {
-    if (taskInput.trim()) {
-      setTasks([...tasks, { text: taskInput, done: false }]);
+    const trimmedInput = taskInput.trim();
+    if (trimmedInput) {
+      const newTask = { text: trimmedInput, done: false, id: Date.now() };
+      setTasks(prevTasks => [...prevTasks, newTask]);
       setTaskInput('');
+      console.log('Task added:', newTask);
     }
   };
-  const toggleTask = idx => {
-    setTasks(tasks => tasks.map((t, i) => i === idx ? { ...t, done: !t.done } : t));
+  
+  const toggleTask = (idx) => {
+    setTasks(prevTasks => 
+      prevTasks.map((task, i) => 
+        i === idx ? { ...task, done: !task.done } : task
+      )
+    );
+    console.log('Task toggled at index:', idx);
   };
-  const removeTask = idx => {
-    setTasks(tasks => tasks.filter((_, i) => i !== idx));
+  
+  const removeTask = (idx) => {
+    setTasks(prevTasks => {
+      const newTasks = prevTasks.filter((_, i) => i !== idx);
+      console.log('Task removed at index:', idx, 'New tasks:', newTasks);
+      return newTasks;
+    });
+  };
+
+  const handleTaskInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTask();
+    }
   };
 
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-center p-4 relative"
-      style={{ 
-        background: theme.background,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
-      {/* Dynamic animated stars background */}
-      <div 
-        className={`absolute inset-0 animate-bgStars-${portrait.replace(/[^a-zA-Z0-9]/g, '')}`}
-        style={{ opacity: 0.3 }}
-      />
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative">
       
       {/* Back Button */}
       <button onClick={() => navigate('/')} className="absolute top-4 left-4 px-4 py-2 bg-pixelGray text-pixelYellow border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel z-10">
@@ -249,24 +235,55 @@ export default function Timer({ onSessionUpdate }) {
       </div>
       {/* Task List */}
       <div className="w-full max-w-sm mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-pixelYellow font-pixel text-sm">Tasks ({tasks.length})</h3>
+          <div className="text-pixelYellow/60 font-pixel text-xs">
+            {tasks.filter(t => t.done).length}/{tasks.length} completed
+          </div>
+        </div>
         <div className="flex gap-2 mb-2">
           <input
-            className="flex-1 px-2 py-1 border-2 border-pixelYellow rounded font-pixel bg-pixelGray text-pixelYellow focus:outline-none"
+            className="flex-1 px-2 py-1 border-2 border-pixelYellow rounded font-pixel bg-pixelGray text-pixelYellow focus:outline-none focus:border-pixelOrange transition-colors"
             placeholder="Add a task..."
             value={taskInput}
             onChange={e => setTaskInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && addTask()}
+            onKeyDown={handleTaskInputKeyDown}
+            maxLength={100}
           />
-          <button onClick={addTask} className="px-4 py-2 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel">Add</button>
+          <button 
+            onClick={addTask} 
+            disabled={!taskInput.trim()}
+            className="px-4 py-2 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add
+          </button>
         </div>
         <ul className="space-y-2">
           {tasks.map((task, idx) => (
-            <li key={idx} className="flex items-center gap-2 bg-pixelGray border-2 border-pixelYellow rounded px-3 py-2">
-              <input type="checkbox" checked={task.done} onChange={() => toggleTask(idx)} className="accent-pixelYellow w-5 h-5" />
-              <span className={`flex-1 font-pixel text-pixelYellow text-sm ${task.done ? 'line-through opacity-60' : ''}`}>{task.text}</span>
-              <button onClick={() => removeTask(idx)} className="text-pixelRed font-bold btn-pixel">✕</button>
+            <li key={task.id || idx} className="flex items-center gap-2 bg-pixelGray border-2 border-pixelYellow rounded px-3 py-2 transition-all hover:bg-pixelGray/80">
+              <input 
+                type="checkbox" 
+                checked={task.done} 
+                onChange={() => toggleTask(idx)} 
+                className="accent-pixelYellow w-5 h-5 cursor-pointer" 
+              />
+              <span className={`flex-1 font-pixel text-pixelYellow text-sm ${task.done ? 'line-through opacity-60' : ''}`}>
+                {task.text}
+              </span>
+              <button 
+                onClick={() => removeTask(idx)} 
+                className="text-pixelRed font-bold btn-pixel hover:text-red-400 transition-colors"
+                title="Remove task"
+              >
+                ✕
+              </button>
             </li>
           ))}
+          {tasks.length === 0 && (
+            <li className="text-center text-pixelYellow/60 font-pixel text-sm py-4">
+              No tasks yet. Add some tasks to track your progress!
+            </li>
+          )}
         </ul>
       </div>
       <div className="w-full max-w-sm">

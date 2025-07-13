@@ -39,9 +39,6 @@ export default function Dashboard() {
   const [streakHistory, setStreakHistory] = useState([]);
   const [showXPHelp, setShowXPHelp] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(() => {
-    return sessionStorage.getItem('welcomeShown') !== 'true';
-  });
   const avatar = getAvatar();
   const navigate = useNavigate();
 
@@ -65,31 +62,11 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (showWelcome) {
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-        sessionStorage.setItem('welcomeShown', 'true');
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [showWelcome]);
-
   // Idle animation: bobbing avatar
   const [bob, setBob] = useState(false);
   useEffect(() => {
     const interval = setInterval(() => setBob(b => !b), 1000);
     return () => clearInterval(interval);
-  }, []);
-
-  // Dynamic background (CSS keyframes)
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @keyframes bgStars { 0% { background-position: 0 0; } 100% { background-position: 100px 100px; } }
-      .animate-bgStars { background-image: url('data:image/svg+xml;utf8,<svg width=\'100\' height=\'100\' xmlns=\'http://www.w3.org/2000/svg\'><circle cx=\'10\' cy=\'10\' r=\'1.5\' fill=\'white\'/><circle cx=\'80\' cy=\'30\' r=\'1\' fill=\'white\'/><circle cx=\'50\' cy=\'70\' r=\'1.2\' fill=\'white\'/><circle cx=\'90\' cy=\'90\' r=\'0.8\' fill=\'white\'/></svg>'); background-repeat: repeat; animation: bgStars 20s linear infinite; }`;
-    document.head.appendChild(style);
-    return () => { document.head.removeChild(style); };
   }, []);
 
   // HP bar animation
@@ -99,47 +76,57 @@ export default function Dashboard() {
   const portrait = profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png';
 
   return (
-    <div className="flex flex-col items-center w-full max-w-2xl mx-auto gap-8 relative">
-      {showWelcome && profile.username && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 mt-4 px-6 py-3 bg-pixelYellow text-pixelGray border-2 border-pixelOrange rounded-lg font-pixel text-lg shadow-pixel z-20 animate-fade-in-out">
-          Welcome Back {profile.username}!
-        </div>
-      )}
+    <div className="flex flex-col items-center w-full max-w-4xl mx-auto gap-8 relative">
       <AnimatedStars />
       {/* XP Help */}
       <button onClick={() => setShowXPHelp(true)} className="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-pixelYellow border-2 border-pixelOrange rounded-full shadow-pixel text-pixelGray text-2xl font-bold z-10" title="How to gain XP?">?</button>
       <XPHelpModal open={showXPHelp} onClose={() => setShowXPHelp(false)} />
-      {/* User Portrait */}
-      <div className="flex items-center justify-center my-4">
-        <img src={portrait} alt="User Portrait" className="w-40 h-56 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray" />
+      
+      {/* Main Title */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-pixel text-pixelYellow mb-2" style={{ textShadow: '0 0 8px #ffe066, 0 0 2px #fff' }}>
+          Let's Lock IN
+        </h1>
       </div>
-      {/* HP and XP Bars */}
-      <div className="flex flex-col items-center gap-2 w-full">
-        <PixelBar type="hp" value={profile.hp} max={100} />
-        <PixelBar type="xp" value={profile.xp} max={profile.xpMax} />
-      </div>
-      {/* Stats */}
-      <div className="flex flex-col items-center gap-4 w-full">
-        <div className="flex gap-4 justify-center">
-          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Level {profile.level}</div>
-          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">HP {profile.hp}/100</div>
-          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">XP {profile.xp}/{profile.xpMax}</div>
+      
+      {/* Portrait and Stats Section */}
+      <div className="flex items-start gap-8 w-full max-w-2xl">
+        {/* User Portrait */}
+        <div className="flex-shrink-0">
+          <img src={portrait} alt="User Portrait" className="w-40 h-56 object-contain rounded-lg border-4 border-pixelYellow shadow-pixel bg-pixelGray" />
         </div>
-        {profile.streak && (
-          <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">
-            🔥 {profile.streak} Day Streak!
+        
+        {/* HP and XP Bars */}
+        <div className="flex flex-col gap-4 flex-1">
+          <div className="text-center mb-2">
+            <h2 className="text-xl text-pixelYellow font-pixel">@{profile.username}</h2>
           </div>
-        )}
+          <PixelBar type="hp" value={profile.hp} max={100} />
+          <PixelBar type="xp" value={profile.xp} max={profile.xpMax} />
+          
+          {/* Stats */}
+          <div className="flex gap-4 justify-center mt-4">
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">Level {profile.level}</div>
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">HP {profile.hp}/100</div>
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs">XP {profile.xp}/{profile.xpMax}</div>
+          </div>
+          {profile.streak && (
+            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs text-center">
+              🔥 {profile.streak} Day Streak!
+            </div>
+          )}
+        </div>
       </div>
+      
       {/* Quick Actions */}
-      <div className="flex flex-col items-center gap-4 w-full">
+      <div className="flex flex-col items-center gap-4 w-full max-w-sm">
         <button 
           onClick={() => navigate('/studypods')} 
-          className="w-full max-w-sm py-4 bg-pixelGreen text-pixelGray border-4 border-pixelYellow rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
+          className="w-full py-4 bg-pixelGreen text-pixelGray border-4 border-pixelYellow rounded-lg font-pixel text-xl shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
         >
           Start Study Session
         </button>
-        <div className="flex gap-4 w-full max-w-sm">
+        <div className="flex gap-4 w-full">
           <button 
             onClick={() => navigate('/profile')} 
             className="flex-1 py-3 bg-pixelBlue text-white border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all btn-pixel"
@@ -154,6 +141,7 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+      
       {/* Streak Calendar */}
       <PixelStreakCalendar streakHistory={streakHistory} />
     </div>

@@ -19,14 +19,28 @@ export function MusicProvider({ children }) {
       musicAudio.src = '/music.mp3';
       musicAudio.loop = true;
       musicAudio.volume = 0.2;
+      musicAudio.preload = 'auto';
       document.body.appendChild(musicAudio);
     }
     setAudio(musicAudio);
 
     // Try to play music (may fail due to autoplay restrictions)
-    musicAudio.play().catch(() => {
-      console.log('Autoplay prevented. User interaction required to start music.');
-    });
+    const playMusic = async () => {
+      try {
+        await musicAudio.play();
+        console.log('Music started successfully');
+      } catch (error) {
+        console.log('Autoplay prevented. User interaction required to start music.');
+        // Set up a one-time click listener to start music
+        const startMusicOnInteraction = () => {
+          musicAudio.play().catch(() => {});
+          document.removeEventListener('click', startMusicOnInteraction);
+        };
+        document.addEventListener('click', startMusicOnInteraction);
+      }
+    };
+
+    playMusic();
 
     return () => {
       if (musicAudio) {

@@ -5,6 +5,7 @@ import Profile from './components/Profile';
 import CustomizeCharacter from './components/CustomizeCharacter';
 import { useAuth } from './AuthContext';
 import { useMusic } from './MusicContext';
+import { useBackground } from './BackgroundContext';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Timer from './Timer';
@@ -71,19 +72,26 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
+  const { currentTheme } = useBackground();
+
   return (
-    <div className="min-h-screen bg-pixelDark flex flex-col font-pixel">
-      <PixelNavbar />
-      <main className="flex-1 flex flex-col items-center justify-start py-8 px-2">
-        <Routes>
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
-          <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-          <Route path="/customize" element={<RequireAuth><CustomizeCharacter /></RequireAuth>} />
-          <Route path="/studypods" element={<RequireAuth><Timer /></RequireAuth>} />
-        </Routes>
-      </main>
+    <div className="min-h-screen flex flex-col font-pixel global-background">
+      {/* Global animated stars background */}
+      <div className="fixed inset-0 global-stars pointer-events-none z-0" />
+      
+      <div className="relative z-10">
+        <PixelNavbar />
+        <main className="flex-1 flex flex-col items-center justify-start py-8 px-2">
+          <Routes>
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+            <Route path="/customize" element={<RequireAuth><CustomizeCharacter /></RequireAuth>} />
+            <Route path="/studypods" element={<RequireAuth><Timer /></RequireAuth>} />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }
