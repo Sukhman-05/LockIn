@@ -21,46 +21,54 @@ const PORTRAITS = [
   }
 ];
 
+const BACKGROUND_COLORS = [
+  { name: 'Classic Brown', color: '#6b4423' },
+  { name: 'Royal Purple', color: '#2d1b4e' },
+  { name: 'Forest Green', color: '#2c7a4a' },
+  { name: 'Sky Blue', color: '#3b82f6' },
+  { name: 'Pixel Gray', color: '#22223b' }
+];
+
 export default function CustomizeCharacter() {
   const { user } = useAuth();
-  const { setPortrait } = useBackground();
+  const { setPortrait, setBackground } = useBackground();
   const [selected, setSelected] = useState(() => {
     return localStorage.getItem('selectedPortrait') || PORTRAITS[0].img;
   });
+  const [bgColor, setBgColor] = useState(() => {
+    return localStorage.getItem('selectedBackground') || BACKGROUND_COLORS[0].color;
+  });
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const current = PORTRAITS.find(p => p.img === selected) || PORTRAITS[0];
 
   const handleSelect = (img) => {
     setSelected(img);
     localStorage.setItem('selectedPortrait', img);
-    setError('');
+    setSuccess(false);
+  };
+
+  const handleBgColor = (color) => {
+    setBgColor(color);
+    localStorage.setItem('selectedBackground', color);
     setSuccess(false);
   };
 
   const handleConfirm = async () => {
     if (!user?.token) {
-      setError('You must be logged in to save your portrait.');
       return;
     }
-
-    setError('');
     setSuccess(false);
     setIsLoading(true);
-
     try {
-      console.log('Saving portrait:', selected);
-      const response = await api.patch('/auth/me', { portrait: selected });
-      
-      console.log('Portrait save response:', response.data);
+      await api.patch('/auth/me', { portrait: selected, background: bgColor });
       setSuccess(true);
       localStorage.setItem('selectedPortrait', selected);
+      localStorage.setItem('selectedBackground', bgColor);
       setPortrait(selected);
+      if (setBackground) setBackground(bgColor);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error('Portrait save error:', err);
-      setError(err.response?.data?.error || 'Failed to save portrait. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +88,8 @@ export default function CustomizeCharacter() {
           <div className="text-pixelYellow font-pixel text-xl mt-2">{current.name}</div>
           <div className="text-pixelYellow font-pixel text-sm text-center max-w-xs mb-2">{current.bio}</div>
         </div>
-        {/* Portrait Selector */}
-        <div className="flex flex-col gap-6 items-center">
+        {/* Portrait Selector & Background Picker */}
+        <div className="flex flex-col gap-8 items-center">
           <div className="flex gap-6">
             {PORTRAITS.map(p => (
               <button
@@ -94,6 +102,21 @@ export default function CustomizeCharacter() {
               </button>
             ))}
           </div>
+          {/* Background Color Picker */}
+          <div className="flex flex-col items-center gap-2 mt-4">
+            <div className="text-pixelYellow font-pixel text-base mb-1">Background Color</div>
+            <div className="flex gap-3">
+              {BACKGROUND_COLORS.map(bg => (
+                <button
+                  key={bg.color}
+                  onClick={() => handleBgColor(bg.color)}
+                  className={`w-10 h-10 rounded-full border-4 shadow-pixel transition-all btn-pixel ${bgColor === bg.color ? 'border-pixelYellow scale-110' : 'border-pixelGray'} `}
+                  style={{ background: bg.color }}
+                  aria-label={bg.name}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
       <button 
@@ -105,12 +128,7 @@ export default function CustomizeCharacter() {
       </button>
       {success && (
         <div className="mt-4 text-pixelGreen font-pixel text-base bg-pixelGray border-2 border-pixelGreen rounded px-4 py-2">
-          ✓ Portrait saved successfully!
-        </div>
-      )}
-      {error && (
-        <div className="mt-4 text-pixelRed font-pixel text-base bg-pixelGray border-2 border-pixelRed rounded px-4 py-2">
-          ✗ {error}
+          ✓ Saved successfully!
         </div>
       )}
     </div>

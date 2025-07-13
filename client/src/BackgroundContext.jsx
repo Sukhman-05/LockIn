@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import axios from 'axios';
+import api from './utils/api';
+
+const DEFAULT_BG = '#6b4423'; // Portrait 1 color
 
 const BackgroundContext = createContext();
 
@@ -33,74 +35,46 @@ export function useBackground() {
 export function BackgroundProvider({ children }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState({});
-  const [currentTheme, setCurrentTheme] = useState(CHARACTER_THEMES['/Character1.png']);
+  const [currentTheme, setCurrentTheme] = useState({ background: DEFAULT_BG });
   const [portrait, setPortrait] = useState(
     profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png'
   );
-  const theme = CHARACTER_THEMES[portrait] || CHARACTER_THEMES['/Character1.png'];
+  const [background, setBackground] = useState(
+    profile.background || localStorage.getItem('selectedBackground') || DEFAULT_BG
+  );
 
+  // Fetch user profile on login to get background and portrait
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${user?.token}` } });
+        const res = await api.get('/auth/me');
         setProfile(res.data);
+        if (res.data.portrait) setPortrait(res.data.portrait);
+        if (res.data.background) setBackground(res.data.background);
       } catch {}
     }
-    if (user?.token) {
-      fetchProfile();
-    }
+    if (user?.token) fetchProfile();
   }, [user]);
 
+  // Update theme when background changes
   useEffect(() => {
-    setCurrentTheme(theme);
-  }, [theme]);
+    setCurrentTheme({ background });
+  }, [background]);
 
-  // Apply global background
+  // Apply global background color
   useEffect(() => {
-    const style = document.createElement('style');
-    style.id = 'global-background-style';
-    style.innerHTML = `
-      @keyframes globalBgStars { 
-        0% { background-position: 0 0; } 
-        100% { background-position: 100px 100px; } 
-      }
-      .global-background {
-        background: ${currentTheme.background} !important;
-        background-size: cover !important;
-        background-position: center !important;
-        min-height: 100vh !important;
-      }
-      .global-stars {
-        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-          ${currentTheme.stars.map((color, i) => 
-            `<circle cx="${10 + i * 20}" cy="${10 + i * 15}" r="${1 + i * 0.3}" fill="${color}"/>`
-          ).join('')}
-        </svg>') !important;
-        background-repeat: repeat !important;
-        animation: globalBgStars 20s linear infinite !important;
-        opacity: 0.3 !important;
-      }`;
-    
-    // Remove existing style if present
-    const existingStyle = document.getElementById('global-background-style');
-    if (existingStyle) {
-      document.head.removeChild(existingStyle);
-    }
-    
-    document.head.appendChild(style);
-    
+    document.body.style.background = background;
     return () => {
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
+      document.body.style.background = '';
     };
-  }, [currentTheme]);
+  }, [background]);
 
   const value = {
     currentTheme,
     portrait,
     setPortrait,
-    CHARACTER_THEMES
+    background,
+    setBackground
   };
 
   return <BackgroundContext.Provider value={value}>{children}</BackgroundContext.Provider>;
