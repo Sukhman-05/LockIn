@@ -8,46 +8,132 @@ const COLORS = {
   pants: ['#23272e', '#ffe066', '#a259f7', '#4ade80', '#ef4444'],
 };
 
+const GENDERS = [
+  { label: '♂', value: 'male', color: 'text-blue-400' },
+  { label: '♀', value: 'female', color: 'text-pink-400' },
+];
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 export default function CustomizeCharacter() {
   const [avatar, setAvatar] = useState({
-    skin: '#f9d6b8',
-    hair: '#23272e',
-    shirt: '#3b82f6',
-    pants: '#23272e',
+    skin: COLORS.skin[0],
+    hair: COLORS.hair[0],
+    shirt: COLORS.shirt[0],
+    pants: COLORS.pants[0],
+    gender: 'female',
+    name: '',
   });
+  const [tab, setTab] = useState(0); // For future: body/hair/clothes tabs
+
   const handleChange = (type, value) => setAvatar(a => ({ ...a, [type]: value }));
+  const handleRandomize = () => {
+    setAvatar(a => ({
+      ...a,
+      skin: randomChoice(COLORS.skin),
+      hair: randomChoice(COLORS.hair),
+      shirt: randomChoice(COLORS.shirt),
+      pants: randomChoice(COLORS.pants),
+      gender: randomChoice(GENDERS).value,
+      name: '',
+    }));
+  };
   const handleSave = () => {
     localStorage.setItem('pixelAvatar', JSON.stringify(avatar));
     alert('Character saved!');
   };
+
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-lg mx-auto">
-      <h2 className="text-2xl text-pixelYellow mb-2">Customize Your Character</h2>
-      <div className="bg-pixelGray border-4 border-pixelYellow rounded-lg p-6 flex flex-col items-center shadow-pixel">
-        <PixelAvatar {...avatar} size={128} />
-        <div className="grid grid-cols-2 gap-4 mt-6 w-full">
-          {Object.entries(COLORS).map(([type, colors]) => (
-            <div key={type} className="flex flex-col items-center">
-              <span className="text-pixelYellow text-xs mb-2 uppercase">{type}</span>
-              <div className="flex gap-2">
-                {colors.map(color => (
-                  <button
-                    key={color}
-                    className={`w-8 h-8 border-2 ${avatar[type] === color ? 'border-pixelYellow' : 'border-pixelGray'} rounded bg-white`}
-                    style={{ background: color }}
-                    onClick={() => handleChange(type, color)}
-                  />
-                ))}
+    <div className="flex flex-col items-center w-full min-h-screen bg-pixelDark py-8 px-2">
+      {/* Header */}
+      <div className="text-3xl md:text-4xl text-pixelYellow font-pixel mb-6 tracking-widest text-center drop-shadow-pixel border-4 border-pixelGray bg-pixelGray px-8 py-2 rounded-lg shadow-pixel" style={{ letterSpacing: 4 }}>
+        CHARACTER CREATION
+      </div>
+      {/* Panel */}
+      <div className="flex flex-col md:flex-row gap-8 bg-pixelGray border-4 border-pixelYellow rounded-lg shadow-pixel p-6 w-full max-w-4xl relative" style={{ backgroundImage: 'linear-gradient(90deg,rgba(0,0,0,0.08) 1px,transparent 1px),linear-gradient(rgba(0,0,0,0.08) 1px,transparent 1px)', backgroundSize: '24px 24px' }}>
+        {/* Left: Profile Form */}
+        <div className="flex-1 flex flex-col gap-4 min-w-[260px]">
+          {/* Tabs (static icons for now) */}
+          <div className="flex gap-2 mb-2">
+            <button className="w-10 h-10 bg-pixelDark border-2 border-pixelYellow rounded flex items-center justify-center"><span role="img" aria-label="head">👤</span></button>
+            <button className="w-10 h-10 bg-pixelDark border-2 border-pixelYellow rounded flex items-center justify-center"><span role="img" aria-label="hair">💇‍♀️</span></button>
+            <button className="w-10 h-10 bg-pixelDark border-2 border-pixelYellow rounded flex items-center justify-center"><span role="img" aria-label="shirt">👕</span></button>
+            <div className="flex-1" />
+            <span className="text-pixelYellow text-sm font-pixel">PROFILE</span>
+          </div>
+          {/* Name */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-pixelYellow font-pixel text-base w-20">NAME :</span>
+            <input
+              className="flex-1 px-2 py-1 bg-pixelDark border-2 border-pixelYellow rounded font-pixel text-pixelYellow text-base focus:outline-none"
+              value={avatar.name}
+              maxLength={16}
+              onChange={e => handleChange('name', e.target.value)}
+              placeholder="Enter name..."
+            />
+            <button onClick={handleRandomize} className="ml-2 w-8 h-8 flex items-center justify-center bg-pixelGray border-2 border-pixelYellow rounded shadow-pixel hover:bg-pixelYellow transition-all" title="Randomize">
+              🎲
+            </button>
+          </div>
+          {/* Race (static for now) */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-pixelYellow font-pixel text-base w-20">RACE :</span>
+            <div className="flex gap-2">
+              <div className="w-10 h-10 bg-pixelDark border-2 border-pixelYellow rounded flex items-center justify-center">
+                <PixelAvatar {...avatar} size={32} />
               </div>
+              <div className="w-10 h-10 bg-pixelGray border-2 border-pixelYellow rounded flex items-center justify-center opacity-40">?</div>
+              <div className="w-10 h-10 bg-pixelGray border-2 border-pixelYellow rounded flex items-center justify-center opacity-40">?</div>
             </div>
-          ))}
+          </div>
+          {/* Gender */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-pixelYellow font-pixel text-base w-20">GENDER :</span>
+            <div className="flex gap-2">
+              {GENDERS.map(g => (
+                <button
+                  key={g.value}
+                  className={`w-10 h-10 border-2 rounded flex items-center justify-center font-pixel text-xl ${avatar.gender === g.value ? 'bg-pixelYellow border-pixelOrange ' + g.color : 'bg-pixelGray border-pixelYellow text-pixelGray'}`}
+                  onClick={() => handleChange('gender', g.value)}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Skin Color */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-pixelYellow font-pixel text-base w-28">SKIN COLOR</span>
+            <div className="flex gap-2">
+              {COLORS.skin.map(color => (
+                <button
+                  key={color}
+                  className={`w-8 h-8 border-2 ${avatar.skin === color ? 'border-pixelYellow' : 'border-pixelGray'} rounded bg-white`}
+                  style={{ background: color }}
+                  onClick={() => handleChange('skin', color)}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Back Button */}
+          <button className="mt-4 px-6 py-2 bg-pixelGray text-pixelYellow border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all w-32" onClick={() => window.history.back()}>
+            BACK
+          </button>
         </div>
-        <button
-          className="mt-8 px-8 py-3 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-lg shadow-pixel hover:bg-pixelOrange hover:text-white transition-all"
-          onClick={handleSave}
-        >
-          Save Character
-        </button>
+        {/* Right: Character Preview & Confirm */}
+        <div className="flex flex-col items-center gap-4 min-w-[220px]">
+          <div className="bg-pixelDark border-4 border-pixelYellow rounded-lg flex items-center justify-center p-4 mb-2" style={{ minWidth: 180, minHeight: 220 }}>
+            <PixelAvatar {...avatar} size={96} />
+          </div>
+          <button className="px-6 py-2 bg-pixelGray text-pixelYellow border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all w-40" onClick={handleRandomize}>
+            RANDOMIZE
+          </button>
+          <button className="px-6 py-2 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelOrange hover:text-white transition-all w-40" onClick={handleSave}>
+            CONFIRM
+          </button>
+        </div>
       </div>
     </div>
   );

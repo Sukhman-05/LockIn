@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Profile from './components/Profile';
 import CustomizeCharacter from './components/CustomizeCharacter';
@@ -13,8 +13,13 @@ const tabs = [
 
 function PixelNavbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { logout } = useAuth();
   
+  const handleLogout = () => {
+    logout(() => navigate('/signin'));
+  };
+
   return (
     <nav className="w-full flex justify-between items-center py-4 px-6 bg-pixelGray border-b-4 border-pixelYellow shadow-pixel">
       <div className="flex gap-8">
@@ -29,7 +34,7 @@ function PixelNavbar() {
         ))}
       </div>
       <button 
-        onClick={logout} 
+        onClick={handleLogout} 
         className="px-4 py-2 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-sm shadow-pixel hover:bg-pixelOrange transition-all"
       >
         Logout
