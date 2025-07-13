@@ -31,7 +31,15 @@ module.exports = {
           700: '#7c3aed',
           800: '#6b21a8',
           900: '#581c87',
-        }
+        },
+        pixelYellow: '#ffe066',
+        pixelOrange: '#ffae42',
+        pixelPurple: '#a259f7',
+        pixelBlue: '#3b82f6',
+        pixelGreen: '#4ade80',
+        pixelRed: '#ef4444',
+        pixelGray: '#23272e',
+        pixelDark: '#181825',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -39,7 +47,12 @@ module.exports = {
       },
       fontFamily: {
         'mono': ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
-      }
+        pixel: ["'Press Start 2P'", 'monospace'],
+      },
+      boxShadow: {
+        pixel: '0 0 0 4px #fff, 0 0 0 8px #000',
+        glow: '0 0 8px 2px #ffe066',
+      },
     },
   },
   plugins: [],
