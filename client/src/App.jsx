@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Dashboard, { XPHelpModal } from './Dashboard';
 import Profile from './components/Profile';
@@ -83,9 +83,7 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
-  const { currentTheme } = useBackground();
-  const [showXPHelp, setShowXPHelp] = useState(false);
-  const [showChatbot, setShowChatbot] = useState(false);
+  const [showXPHelp, setShowXPHelp] = React.useState(false);
 
   return (
     <div className="min-h-screen flex flex-col font-pixel global-background bg-transparent">

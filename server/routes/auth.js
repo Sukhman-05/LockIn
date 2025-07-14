@@ -1,11 +1,12 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { registerValidation, loginValidation, validate } = require('../middleware/validation');
 
 const router = express.Router();
 
 // Register
-router.post('/register', async (req, res) => {
+router.post('/register', registerValidation, validate, async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const user = new User({ username, email, password });
@@ -17,15 +18,10 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', loginValidation, validate, async (req, res) => {
   const startTime = Date.now();
   try {
     const { email, password } = req.body;
-    
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
     
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
@@ -116,7 +112,7 @@ function auth(req, res, next) {
 // Get current user profile
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user).select('username email xp level portrait createdAt lastLoginDate');
+    const user = await User.findById(req.user).select('username email xp level portrait createdAt lastLoginDate streak');
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });

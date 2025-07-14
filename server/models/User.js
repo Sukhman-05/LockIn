@@ -54,12 +54,26 @@ UserSchema.methods.calculateLevel = function() {
   return Math.floor(this.xp / 100) + 1;
 };
 
+// Calculate XP required for next level
+UserSchema.methods.calculateXpMax = function() {
+  const currentLevel = this.level || this.calculateLevel();
+  return currentLevel * 100;
+};
+
 // Add XP and update level
 UserSchema.methods.addXP = function(amount) {
   this.xp += amount;
   this.level = this.calculateLevel();
   return this.save();
 };
+
+// Virtual property for xpMax
+UserSchema.virtual('xpMax').get(function() {
+  return this.calculateXpMax();
+});
+
+// Ensure virtuals are included in JSON
+UserSchema.set('toJSON', { virtuals: true });
 
 // Update streak
 UserSchema.methods.updateStreak = function() {

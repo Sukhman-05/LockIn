@@ -6,9 +6,62 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { body, validationResult } = require('express-validator');
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Validation middleware
+const notebookValidation = [
+  body('title')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Title must be between 1 and 100 characters'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Description must be less than 500 characters'),
+  body('subject')
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Subject must be between 1 and 50 characters'),
+  body('course')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Course must be less than 100 characters')
+];
+
+const contentValidation = [
+  body('title')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Title must be between 1 and 100 characters'),
+  body('type')
+    .isIn(['text', 'pdf', 'image', 'link', 'note'])
+    .withMessage('Type must be text, pdf, image, link, or note'),
+  body('content')
+    .optional()
+    .trim()
+    .isLength({ max: 10000 })
+    .withMessage('Content must be less than 10000 characters'),
+  body('importance')
+    .optional()
+    .isIn(['low', 'medium', 'high', 'critical'])
+    .withMessage('Importance must be low, medium, high, or critical')
+];
+
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      error: 'Validation Error',
+      details: errors.array()
+    });
+  }
+  next();
+};
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -52,16 +105,16 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Create a new notebook
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, notebookValidation, validate, async (req, res) => {
   try {
     const { title, description, subject, course, color } = req.body;
     
     const notebook = new Notebook({
       userId: req.user.id,
-      title,
-      description,
-      subject,
-      course,
+      title: title.trim(),
+      description: description?.trim() || '',
+      subject: subject.trim(),
+      course: course?.trim() || '',
       color: color || '#3B82F6'
     });
 
@@ -95,7 +148,7 @@ router.get('/:notebookId', authenticateToken, async (req, res) => {
 });
 
 // Upload content to notebook
-router.post('/:notebookId/content', authenticateToken, upload.single('file'), async (req, res) => {
+router.post('/:notebookId/content', authenticateToken, upload.single('file'), contentValidation, validate, async (req, res) => {
   try {
     const notebook = await Notebook.findOne({ 
       _id: req.params.notebookId, 
@@ -117,12 +170,12 @@ router.post('/:notebookId/content', authenticateToken, upload.single('file'), as
     }
     
     const contentItem = {
-      title,
+      title: title.trim(),
       type: type || 'text',
-      content: content || '',
+      content: content?.trim() || '',
       filePath,
       fileSize,
-      tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+      tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [],
       importance: importance || 'medium'
     };
     

@@ -3,15 +3,53 @@ const router = express.Router();
 const Task = require('../models/Task');
 const { authenticateToken } = require('../middleware/security');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { body, validationResult } = require('express-validator');
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Validation middleware
+const taskValidation = [
+  body('title')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Title must be between 1 and 100 characters'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Description must be less than 500 characters'),
+  body('category')
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Category must be between 1 and 50 characters'),
+  body('priority')
+    .isIn(['low', 'medium', 'high', 'urgent'])
+    .withMessage('Priority must be low, medium, high, or urgent'),
+  body('dueDate')
+    .isISO8601()
+    .withMessage('Due date must be a valid date'),
+  body('estimatedDuration')
+    .isInt({ min: 1, max: 1440 })
+    .withMessage('Estimated duration must be between 1 and 1440 minutes')
+];
+
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      error: 'Validation Error',
+      details: errors.array()
+    });
+  }
+  next();
+};
 
 // Get all tasks for a user
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const tasks = await Task.find({ userId: req.user.id })
-      .sort({ dueDate: 1, priority: -1 });
+      .sort({ dueDate: 1 });
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch tasks' });
@@ -19,15 +57,15 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Create a new task
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, taskValidation, validate, async (req, res) => {
   try {
     const { title, description, category, priority, dueDate, estimatedDuration } = req.body;
     
     const task = new Task({
       userId: req.user.id,
-      title,
-      description,
-      category,
+      title: title.trim(),
+      description: description?.trim() || '',
+      category: category.trim(),
       priority,
       dueDate: new Date(dueDate),
       totalEstimatedDuration: estimatedDuration

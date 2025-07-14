@@ -1,17 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import api from '../utils/api';
-import { useBackground } from '../BackgroundContext';
 
 const Chatbot = ({ onAddTasks }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
-  const [sessionInfo, setSessionInfo] = useState(null);
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
-  const { portrait: bgPortrait } = useBackground();
   const [profile, setProfile] = useState({});
   const welcomeSentRef = useRef(false);
 
@@ -66,7 +63,7 @@ const Chatbot = ({ onAddTasks }) => {
           // Load session info if it exists
           try {
             const sessionRes = await api.get(`/chatbot/session/${newSessionId}`);
-            setSessionInfo(sessionRes.data);
+            // setSessionInfo(sessionRes.data); // This line was removed as per the edit hint
           } catch (error) {
             console.log('No existing session info found');
             // New session, no info to load
