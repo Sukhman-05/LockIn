@@ -15,11 +15,21 @@ export default function SignIn() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    // Add timeout for better UX
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        setError('Login is taking longer than expected. Please wait...');
+      }
+    }, 5000);
+    
     try {
       const res = await api.post('/auth/login', { email, password });
+      clearTimeout(timeoutId);
       login(res.data.token);
       navigate('/');
     } catch (err) {
+      clearTimeout(timeoutId);
       setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
