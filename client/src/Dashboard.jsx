@@ -43,19 +43,19 @@ export default function Dashboard({ sessionUpdateTrigger }) {
 
   // Function to refresh profile data
   const refreshProfile = async () => {
-    try {
-      const res = await api.get('/auth/me');
-      setProfile(p => ({ ...p, ...res.data }));
-    } catch {}
+      try {
+        const res = await api.get('/auth/me');
+        setProfile(p => ({ ...p, ...res.data }));
+      } catch {}
   };
 
   // Function to refresh streak data
   const refreshStreak = async () => {
-    try {
-      const res = await api.get('/sessions/streak');
-      setProfile(p => ({ ...p, streak: res.data.streak }));
-      setStreakHistory(res.data.streakHistory || []);
-    } catch {}
+      try {
+        const res = await api.get('/sessions/streak');
+        setProfile(p => ({ ...p, streak: res.data.streak }));
+        setStreakHistory(res.data.streakHistory || []);
+      } catch {}
   };
 
   useEffect(() => {

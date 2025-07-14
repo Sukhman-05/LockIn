@@ -353,7 +353,7 @@ export default function Timer({ onSessionUpdate }) {
               </button>
               <button
                 onClick={reset}
-                className="flex-1 py-2 md:py-3 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-base md:text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 btn-pixel"
+                className="flex-1 py-2 md:py-3 bg-pixelRed text-white border-2 border-pixelYellow rounded font-pixel text-base md:text-lg shadow-pixel hover:bg-pixelYellow hover:text-pixelGray transition-all duration-200 btn-pixel opacity-60 grayscale"
               >
                 Quit
               </button>

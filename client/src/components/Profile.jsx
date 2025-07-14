@@ -9,14 +9,14 @@ export default function Profile({ sessionUpdateTrigger }) {
 
   // Function to refresh profile data
   const refreshProfile = async () => {
-    try {
-      const res = await api.get('/auth/me');
-      setProfile(res.data);
-    } catch {
-      setProfile(null);
-    } finally {
-      setLoading(false);
-    }
+      try {
+        const res = await api.get('/auth/me');
+        setProfile(res.data);
+      } catch {
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
   };
 
   useEffect(() => {

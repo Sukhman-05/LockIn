@@ -16,7 +16,7 @@ app.use(cors({
     'https://lock-in-gray.vercel.app',
     'https://lockin-emt7.onrender.com',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -51,15 +51,6 @@ app.use('/api/notebooks', notebookRouter);
 
 app.get('/api', (req, res) => {
   res.json({ message: 'API is running' });
-});
-
-// Test endpoint for debugging
-app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'Test endpoint working',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
 });
 
 // Health check endpoint for monitoring

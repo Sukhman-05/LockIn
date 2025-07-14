@@ -38,11 +38,9 @@ const Chatbot = ({ onAddTasks }) => {
       // Generate new session ID
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
-      
-      // Test API connectivity first
+      // Remove API connectivity test (no longer needed)
       setTimeout(async () => {
         try {
-          const testRes = await api.get('/api/test');
           const statsRes = await api.get('/chatbot/stats');
           const welcomeRes = await api.post('/chatbot/chat', {
             message: "Hello! I'm starting a new study session. Please give me a personalized welcome message based on my stats.",

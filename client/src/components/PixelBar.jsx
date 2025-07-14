@@ -38,7 +38,7 @@ export default function PixelBar({ type = 'xp', value = 0, max = 100, hideLabelO
           <div 
             className={`h-full ${fill} transition-all duration-300`}
             style={{ width: `${percentage}%` }}
-          />
+            />
         </div>
       </div>
     </div>
