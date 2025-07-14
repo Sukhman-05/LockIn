@@ -84,6 +84,12 @@ function RequireAuth({ children }) {
 
 export default function App() {
   const [showXPHelp, setShowXPHelp] = React.useState(false);
+  const [sessionUpdateTrigger, setSessionUpdateTrigger] = React.useState(0);
+
+  // Function to trigger session updates across components
+  const handleSessionUpdate = () => {
+    setSessionUpdateTrigger(prev => prev + 1);
+  };
 
   return (
     <div className="min-h-screen flex flex-col font-pixel global-background bg-transparent">
@@ -95,10 +101,10 @@ export default function App() {
           <Routes>
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+            <Route path="/" element={<RequireAuth><Dashboard sessionUpdateTrigger={sessionUpdateTrigger} /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><Profile sessionUpdateTrigger={sessionUpdateTrigger} /></RequireAuth>} />
             <Route path="/customize" element={<RequireAuth><CustomizeCharacter /></RequireAuth>} />
-            <Route path="/studypods" element={<RequireAuth><Timer /></RequireAuth>} />
+            <Route path="/studypods" element={<RequireAuth><Timer onSessionUpdate={handleSessionUpdate} /></RequireAuth>} />
             <Route path="/tasks" element={<RequireAuth><TaskPlanner /></RequireAuth>} />
             <Route path="/notebooks" element={<RequireAuth><StudyNotebook /></RequireAuth>} />
             <Route path="/chatbot" element={<RequireAuth><div className="w-full h-full"><Chatbot isOpen={true} onClose={() => {}} /></div></RequireAuth>} />

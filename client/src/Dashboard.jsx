@@ -32,7 +32,7 @@ export function XPHelpModal({ open, onClose }) {
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({ sessionUpdateTrigger }) {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState({ username: '', level: 1, xp: 0, xpMax: 100, hp: 100 });
   const [streakHistory, setStreakHistory] = useState([]);
@@ -41,23 +41,46 @@ export default function Dashboard() {
   const avatar = getAvatar();
   const navigate = useNavigate();
 
+  // Function to refresh profile data
+  const refreshProfile = async () => {
+    try {
+      const res = await api.get('/auth/me');
+      setProfile(p => ({ ...p, ...res.data }));
+    } catch {}
+  };
+
+  // Function to refresh streak data
+  const refreshStreak = async () => {
+    try {
+      const res = await api.get('/sessions/streak');
+      setProfile(p => ({ ...p, streak: res.data.streak }));
+      setStreakHistory(res.data.streakHistory || []);
+    } catch {}
+  };
+
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const res = await api.get('/auth/me');
-        setProfile(p => ({ ...p, ...res.data }));
-      } catch {}
-    }
-    async function fetchStreak() {
-      try {
-        const res = await api.get('/sessions/streak');
-        setProfile(p => ({ ...p, streak: res.data.streak }));
-        setStreakHistory(res.data.streakHistory || []);
-      } catch {}
-    }
     if (user?.token) {
-      fetchProfile();
-      fetchStreak();
+      refreshProfile();
+      refreshStreak();
+    }
+  }, [user]);
+
+  // Refresh data when sessionUpdateTrigger changes (immediate update)
+  useEffect(() => {
+    if (user?.token && sessionUpdateTrigger > 0) {
+      refreshProfile();
+      refreshStreak();
+    }
+  }, [sessionUpdateTrigger, user]);
+
+  // Refresh data periodically to catch updates
+  useEffect(() => {
+    if (user?.token) {
+      const interval = setInterval(() => {
+        refreshProfile();
+        refreshStreak();
+      }, 5000); // Refresh every 5 seconds
+      return () => clearInterval(interval);
     }
   }, [user]);
 

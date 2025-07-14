@@ -2,23 +2,44 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext';
 import api from '../utils/api';
 
-export default function Profile() {
+export default function Profile({ sessionUpdateTrigger }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const res = await api.get('/auth/me');
-        setProfile(res.data);
-      } catch {
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
+  // Function to refresh profile data
+  const refreshProfile = async () => {
+    try {
+      const res = await api.get('/auth/me');
+      setProfile(res.data);
+    } catch {
+      setProfile(null);
+    } finally {
+      setLoading(false);
     }
-    if (user?.token) fetchProfile();
+  };
+
+  useEffect(() => {
+    if (user?.token) {
+      refreshProfile();
+    }
+  }, [user]);
+
+  // Refresh data when sessionUpdateTrigger changes (immediate update)
+  useEffect(() => {
+    if (user?.token && sessionUpdateTrigger > 0) {
+      refreshProfile();
+    }
+  }, [sessionUpdateTrigger, user]);
+
+  // Refresh data periodically to catch updates
+  useEffect(() => {
+    if (user?.token) {
+      const interval = setInterval(() => {
+        refreshProfile();
+      }, 5000); // Refresh every 5 seconds
+      return () => clearInterval(interval);
+    }
   }, [user]);
 
   if (loading) return <div className="flex justify-center items-center h-64"><span className="animate-spin h-8 w-8 border-4 border-pixelGray border-t-pixelYellow rounded-full"></span></div>;
@@ -65,8 +86,7 @@ export default function Profile() {
             </div>
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">HP</div>
-              <div className="text-pixelRed text-xl font-pixel">{profile.hp} <span className='text-pixelYellow text-base'>/ 100</span></div>
-              <div className="text-pixelYellow text-xs font-pixel mt-1">Health Points</div>
+              <div className="text-pixelRed text-xl font-pixel">{profile.hp}</div>
             </div>
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">Streak</div>
