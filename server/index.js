@@ -13,7 +13,8 @@ app.use(apiLimiter);
 
 app.use(cors({
   origin: [
-    'https://lock-in-gray.vercel.app', // Vercel frontend
+    'https://lock-in-gray.vercel.app',
+    'https://lockin-emt7.onrender.com',
     'http://localhost:5173',
     'http://localhost:3000'
   ],
