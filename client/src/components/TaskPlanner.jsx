@@ -28,10 +28,13 @@ const TaskPlanner = () => {
   const loadTasks = async () => {
     try {
       setLoading(true);
+      console.log('Attempting to load tasks...');
       const response = await api.get('/tasks');
+      console.log('Tasks response:', response.data);
       setTasks(response.data);
     } catch (error) {
       console.error('Failed to load tasks:', error);
+      console.error('Error details:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }

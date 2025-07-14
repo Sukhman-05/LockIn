@@ -25,17 +25,24 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
       
-      // Welcome message with AI-generated personalized greeting
+      // Test API connectivity first
       setTimeout(async () => {
         try {
+          console.log('Testing API connectivity...');
+          const testRes = await api.get('/api/test');
+          console.log('API test response:', testRes.data);
+          
+          console.log('Attempting to fetch chatbot stats...');
           const statsRes = await api.get('/chatbot/stats');
-          const stats = statsRes.data;
+          console.log('Stats response:', statsRes.data);
           
           // Generate AI welcome message
+          console.log('Attempting to generate welcome message...');
           const welcomeRes = await api.post('/chatbot/chat', {
             message: "Hello! I'm starting a new study session. Please give me a personalized welcome message based on my stats.",
             sessionId: newSessionId
           });
+          console.log('Welcome response:', welcomeRes.data);
           
           addBotMessage(welcomeRes.data.message);
           
@@ -44,9 +51,13 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
             const sessionRes = await api.get(`/chatbot/session/${newSessionId}`);
             setSessionInfo(sessionRes.data);
           } catch (error) {
+            console.log('No existing session info found');
             // New session, no info to load
           }
         } catch (error) {
+          console.error('Chatbot initialization error:', error);
+          console.error('Error response:', error.response?.data);
+          console.error('Error status:', error.response?.status);
           // Simple fallback welcome message
           addBotMessage("Hi there! I'm your LockIn study buddy! 🎯\n\nWhat would you like to work on today?");
         }
@@ -168,8 +179,8 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-pixelGray/95 backdrop-blur-sm border-4 border-pixelYellow rounded-lg shadow-pixel w-full max-w-md max-h-[80vh] flex flex-col">
+    <div className={`${isOpen ? 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4' : 'w-full h-full'}`}>
+      <div className={`bg-pixelGray/95 backdrop-blur-sm border-4 border-pixelYellow rounded-lg shadow-pixel ${isOpen ? 'w-full max-w-md max-h-[80vh]' : 'w-full h-full max-w-4xl mx-auto'} flex flex-col`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-2 border-pixelYellow">
           <div className="flex items-center gap-3">
@@ -190,7 +201,7 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-96">
+        <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${isOpen ? 'max-h-96' : 'h-full'}`}>
           {messages.map((message, index) => (
             <div
               key={index}

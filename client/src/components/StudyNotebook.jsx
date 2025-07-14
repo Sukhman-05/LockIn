@@ -39,10 +39,13 @@ const StudyNotebook = () => {
   const loadNotebooks = async () => {
     try {
       setLoading(true);
+      console.log('Attempting to load notebooks...');
       const response = await api.get('/notebooks');
+      console.log('Notebooks response:', response.data);
       setNotebooks(response.data);
     } catch (error) {
       console.error('Failed to load notebooks:', error);
+      console.error('Error details:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
