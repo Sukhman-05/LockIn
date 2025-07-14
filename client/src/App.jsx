@@ -103,7 +103,7 @@ export default function App() {
             <Route path="/studypods" element={<RequireAuth><Timer /></RequireAuth>} />
             <Route path="/tasks" element={<RequireAuth><TaskPlanner /></RequireAuth>} />
             <Route path="/notebooks" element={<RequireAuth><StudyNotebook /></RequireAuth>} />
-            <Route path="/chatbot" element={<RequireAuth><div className="w-full h-full"><Chatbot isOpen={false} onClose={() => {}} /></div></RequireAuth>} />
+            <Route path="/chatbot" element={<RequireAuth><div className="w-full h-full"><Chatbot isOpen={true} onClose={() => {}} /></div></RequireAuth>} />
           </Routes>
         </main>
         {/* XP Help Modal (global) */}
