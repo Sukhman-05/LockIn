@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import api from '../utils/api';
+import { useBackground } from '../BackgroundContext';
 
-const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
+const Chatbot = ({ onAddTasks }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -10,6 +11,8 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
   const [sessionInfo, setSessionInfo] = useState(null);
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
+  const { portrait: bgPortrait } = useBackground();
+  const [profile, setProfile] = useState({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -20,7 +23,19 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (user?.token) {
+      async function fetchProfile() {
+        try {
+          const res = await api.get('/auth/me');
+          setProfile(res.data);
+        } catch {}
+      }
+      fetchProfile();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.token && messages.length === 0) {
       // Generate new session ID
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
@@ -63,11 +78,11 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
         }
       }, 500);
     }
-  }, [isOpen]);
+  }, [user]);
 
   // Check for reminders periodically
   useEffect(() => {
-    if (isOpen) {
+    if (user?.token) {
       const checkReminders = async () => {
         try {
           const res = await api.get('/chatbot/reminders');
@@ -88,7 +103,7 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
       const interval = setInterval(checkReminders, 5 * 60 * 1000);
       return () => clearInterval(interval);
     }
-  }, [isOpen]);
+  }, [user]);
 
   const addBotMessage = (text) => {
     setMessages(prev => [...prev, { type: 'bot', text, timestamp: new Date() }]);
@@ -176,11 +191,12 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
     }
   };
 
-  if (!isOpen) return null;
+  // Get portrait for user bubble
+  const portrait = profile.portrait || localStorage.getItem('selectedPortrait') || '/Character1.png';
 
   return (
-    <div className={`${isOpen ? 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4' : 'w-full h-full'}`}>
-      <div className={`bg-pixelGray/95 backdrop-blur-sm border-4 border-pixelYellow rounded-lg shadow-pixel ${isOpen ? 'w-full max-w-md max-h-[80vh]' : 'w-full h-full max-w-4xl mx-auto'} flex flex-col`}>
+    <div className="w-full h-full flex flex-col items-center justify-start py-4 px-2 md:px-4 max-w-3xl mx-auto">
+      <div className="bg-pixelGray/95 border-4 border-pixelYellow rounded-lg shadow-pixel w-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-2 border-pixelYellow">
           <div className="flex items-center gap-3">
@@ -192,21 +208,19 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
               <p className="text-pixelYellow/70 font-pixel text-xs">Your AI companion</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-pixelRed hover:text-red-400 font-bold text-xl btn-pixel"
-          >
-            ✕
-          </button>
         </div>
-
         {/* Messages */}
-        <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${isOpen ? 'max-h-96' : 'h-full'}`}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 h-[50vh] md:h-[60vh]">
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex items-end gap-2 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
+              {message.type === 'bot' && (
+                <div className="w-10 h-10 bg-pixelYellow rounded-full flex items-center justify-center text-pixelGray font-bold text-lg border-2 border-pixelYellow">
+                  🤖
+                </div>
+              )}
               <div
                 className={`max-w-[80%] px-3 py-2 rounded-lg font-pixel text-sm ${
                   message.type === 'user'
@@ -221,9 +235,15 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
+              {message.type === 'user' && (
+                <img
+                  src={portrait}
+                  alt="User Portrait"
+                  className="w-10 h-10 object-contain rounded-full border-2 border-pixelYellow bg-pixelGray"
+                />
+              )}
             </div>
           ))}
-          
           {isTyping && (
             <div className="flex justify-start">
               <div className="bg-pixelGray/80 border-2 border-pixelYellow rounded-lg px-3 py-2">
@@ -235,10 +255,8 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
               </div>
             </div>
           )}
-          
           <div ref={messagesEndRef} />
         </div>
-
         {/* Quick Actions */}
         <div className="p-4 border-t-2 border-pixelYellow">
           <div className="flex flex-wrap gap-2 mb-3">
@@ -283,7 +301,6 @@ const Chatbot = ({ onAddTasks, isOpen, onClose }) => {
               🗑️ Clear
             </button>
           </div>
-
           {/* Input */}
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
