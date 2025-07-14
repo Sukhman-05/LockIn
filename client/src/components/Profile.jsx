@@ -52,24 +52,25 @@ export default function Profile() {
         </div>
         {/* Stats/Other Info */}
         <div className="flex flex-col items-center justify-center bg-pixelGray/80 border-4 border-pixelYellow rounded-lg shadow-pixel p-4 flex-1 min-w-0 w-full">
-          {/* Stats Grid */}
+          {/* Stats Grid - Redesigned */}
           <div className="grid grid-cols-2 gap-4 w-full mb-6">
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">Level</div>
-              <div className="text-white text-xl font-pixel">{profile.level}</div>
+              <div className="text-white text-2xl font-pixel">{profile.level}</div>
             </div>
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">XP</div>
-              <div className="text-white text-xl font-pixel">{profile.xp}/{profile.xpMax || 100}</div>
+              <div className="text-pixelGreen text-xl font-pixel">{profile.xp} <span className='text-pixelYellow text-base'>/ {profile.xpMax || 100}</span></div>
+              <div className="text-pixelYellow text-xs font-pixel mt-1">Experience Points</div>
             </div>
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">HP</div>
-              <div className="text-white text-xl font-pixel">{profile.hp}</div>
+              <div className="text-pixelRed text-xl font-pixel">{profile.hp} <span className='text-pixelYellow text-base'>/ 100</span></div>
               <div className="text-pixelYellow text-xs font-pixel mt-1">Health Points</div>
             </div>
             <div className="bg-pixelGray/50 border-2 border-pixelYellow rounded p-3 text-center">
               <div className="text-pixelYellow text-xs font-pixel">Streak</div>
-              <div className="text-white text-xl font-pixel">{profile.streak || 0}</div>
+              <div className="text-white text-2xl font-pixel">{profile.streak || 0}</div>
             </div>
           </div>
           

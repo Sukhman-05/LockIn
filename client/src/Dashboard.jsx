@@ -97,13 +97,12 @@ export default function Dashboard() {
           <div className="text-center mb-2">
             <h2 className="text-lg md:text-xl text-pixelYellow font-pixel">@{profile.username}</h2>
           </div>
-          <PixelBar type="hp" value={profile.hp} max={100} hideLabelOnDesktop />
-          <PixelBar type="xp" value={profile.xp} max={profile.xpMax} hideLabelOnDesktop />
-          {/* Stats */}
+          <div className="flex flex-col gap-2 w-full items-center justify-center">
+            <PixelBar type="hp" value={profile.hp} max={100} />
+            <PixelBar type="xp" value={profile.xp} max={profile.xpMax} />
+          </div>
           <div className="flex flex-col gap-2 w-full items-center mt-2">
             <div className="bg-pixelGray border-2 border-pixelYellow rounded px-2 md:px-3 py-1 font-pixel text-pixelYellow text-xs w-full text-center">Level {profile.level}</div>
-            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-2 md:px-3 py-1 font-pixel text-pixelYellow text-xs w-full text-center">HP {profile.hp}/100</div>
-            <div className="bg-pixelGray border-2 border-pixelYellow rounded px-2 md:px-3 py-1 font-pixel text-pixelYellow text-xs w-full text-center">XP {profile.xp}/{profile.xpMax}</div>
           </div>
           {profile.streak && (
             <div className="bg-pixelGray border-2 border-pixelYellow rounded px-3 py-1 font-pixel text-pixelYellow text-xs text-center mt-2">

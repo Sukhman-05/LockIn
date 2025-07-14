@@ -13,6 +13,7 @@ const Chatbot = ({ onAddTasks }) => {
   const { user } = useAuth();
   const { portrait: bgPortrait } = useBackground();
   const [profile, setProfile] = useState({});
+  const welcomeSentRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,7 +36,8 @@ const Chatbot = ({ onAddTasks }) => {
   }, [user]);
 
   useEffect(() => {
-    if (user?.token && messages.length === 0) {
+    if (user?.token && messages.length === 0 && !welcomeSentRef.current) {
+      welcomeSentRef.current = true;
       // Generate new session ID
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);

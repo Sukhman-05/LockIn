@@ -107,6 +107,10 @@ const StudyNotebook = () => {
 
       // Refresh notebook data
       const notebookResponse = await api.get(`/notebooks/${selectedNotebook._id}`);
+      // Ensure conversations array exists
+      if (!notebookResponse.data.conversations) {
+        notebookResponse.data.conversations = [];
+      }
       setSelectedNotebook(notebookResponse.data);
       
       setContentForm({
