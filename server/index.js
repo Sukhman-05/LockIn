@@ -12,9 +12,11 @@ app.use(securityHeaders);
 app.use(apiLimiter);
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.vercel.app'] 
-    : ['http://localhost:5173', 'http://localhost:3000'],
+  origin: [
+    'https://lock-in-gray.vercel.app', // Vercel frontend
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
