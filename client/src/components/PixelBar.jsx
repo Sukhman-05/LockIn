@@ -1,20 +1,20 @@
 import React from 'react';
 
-// Pixel colors for XP and HP
+// Pixelated colors for XP and HP
 const BAR_COLORS = {
   xp: {
-    fill: 'bg-pixelGreen',
-    border: 'border-pixelYellow',
-    text: 'text-pixelYellow',
-    label: 'XP',
-    glow: 'shadow-[0_0_8px_#ffe066]'
+    fill: 'bg-blue-400',
+    bg: 'bg-black',
+    border: 'border-white',
+    text: 'text-white',
+    label: 'XP'
   },
   hp: {
-    fill: 'bg-pixelRed',
-    border: 'border-pixelRed',
+    fill: 'bg-red-600',
+    bg: 'bg-black',
+    border: 'border-white',
     text: 'text-white',
-    label: 'HP',
-    glow: 'shadow-[0_0_8px_#ff4d4d]'
+    label: 'HP'
   }
 };
 
@@ -23,25 +23,22 @@ export default function PixelBar({ type = 'xp', value = 0, max = 100, hideLabelO
   const safeValue = Math.max(0, value || 0);
   const safeMax = Math.max(1, max || 100); // Prevent division by zero
   const percentage = Math.min(100, (safeValue / safeMax) * 100);
-  const blocks = Math.ceil(percentage / 10); // 10 blocks for 100%
-  const { fill, border, text, label, glow } = BAR_COLORS[type] || BAR_COLORS.xp;
+  const { fill, bg, border, text, label } = BAR_COLORS[type] || BAR_COLORS.xp;
+  
   return (
     <div className="w-full flex flex-col items-center mb-4">
-      {/* Numeric value above bar */}
-      <div className={`mb-1 font-pixel text-sm ${text} text-center`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>
-        {label}: <span className="font-bold">{value}</span>/<span>{max}</span>
+      {/* Label */}
+      <div className={`mb-1 text-xs font-pixel ${text}`}>
+        {label}
       </div>
-      <div className="w-full flex justify-center">
-        <div className={`relative w-64 h-8 flex items-center ${border} border-4 rounded-full bg-pixelGray overflow-hidden`} style={{ boxShadow: '0 0 0 2px #000, 0 0 8px #0008' }}>
-          {[...Array(blocks)].map((_, i) => (
-            <div
-              key={i}
-              className={`flex-1 h-full mx-0.5 ${i < blocks ? fill : 'bg-pixelGray'} ${i < blocks ? glow : ''} rounded-full transition-all duration-300`}
-              style={{ minWidth: 0 }}
-            />
-          ))}
-          {/* Centered label inside bar (optional, can remove if not needed) */}
-          {/* <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${text} text-xs font-pixel z-10`} style={{ textShadow: '0 0 2px #000, 0 0 8px #0008' }}>{label}</span> */}
+      
+      {/* Pixelated progress bar */}
+      <div className="w-full max-w-xs">
+        <div className={`w-full h-6 ${bg} border-2 ${border} flex pixel`}>
+          <div 
+            className={`h-full ${fill} transition-all duration-300`}
+            style={{ width: `${percentage}%` }}
+          />
         </div>
       </div>
     </div>
