@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../AuthContext';
 
 function Analytics() {
@@ -14,9 +14,7 @@ function Analytics() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('/api/sessions/stats', {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
+        const res = await api.get('/sessions/stats');
         setStats(res.data);
       } catch (err) {
         console.error('Failed to fetch stats:', err);

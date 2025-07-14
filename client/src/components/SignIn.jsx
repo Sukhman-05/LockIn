@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../AuthContext';
 
 export default function SignIn() {
@@ -16,7 +16,7 @@ export default function SignIn() {
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       login(res.data.token);
       navigate('/');
     } catch (err) {
