@@ -32,17 +32,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error);
-    
     // Handle specific error types
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       return Promise.reject(new Error('Request timed out. Please check your connection and try again.'));
     }
-    
     if (error.response?.status === 0) {
       return Promise.reject(new Error('Unable to connect to server. Please check your internet connection.'));
     }
-    
     return Promise.reject(error);
   }
 );

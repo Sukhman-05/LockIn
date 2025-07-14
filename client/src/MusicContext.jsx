@@ -28,10 +28,9 @@ export function MusicProvider({ children }) {
     const playMusic = async () => {
       try {
         await musicAudio.play();
-        console.log('Music started successfully');
+        // Music started successfully
       } catch (error) {
-        console.log('Autoplay prevented. User interaction required to start music.');
-        // Set up a one-time click listener to start music
+        // Autoplay prevented. User interaction required to start music.
         const startMusicOnInteraction = () => {
           musicAudio.play().catch(() => {});
           document.removeEventListener('click', startMusicOnInteraction);

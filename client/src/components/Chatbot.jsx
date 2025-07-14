@@ -42,37 +42,21 @@ const Chatbot = ({ onAddTasks }) => {
       // Test API connectivity first
       setTimeout(async () => {
         try {
-          console.log('Testing API connectivity...');
           const testRes = await api.get('/api/test');
-          console.log('API test response:', testRes.data);
-          
-          console.log('Attempting to fetch chatbot stats...');
           const statsRes = await api.get('/chatbot/stats');
-          console.log('Stats response:', statsRes.data);
-          
-          // Generate AI welcome message
-          console.log('Attempting to generate welcome message...');
           const welcomeRes = await api.post('/chatbot/chat', {
             message: "Hello! I'm starting a new study session. Please give me a personalized welcome message based on my stats.",
             sessionId: newSessionId
           });
-          console.log('Welcome response:', welcomeRes.data);
-          
           addBotMessage(welcomeRes.data.message);
-          
-          // Load session info if it exists
           try {
             const sessionRes = await api.get(`/chatbot/session/${newSessionId}`);
             // setSessionInfo(sessionRes.data); // This line was removed as per the edit hint
           } catch (error) {
-            console.log('No existing session info found');
-            // New session, no info to load
+            // Silently ignore missing session info
           }
         } catch (error) {
-          console.error('Chatbot initialization error:', error);
-          console.error('Error response:', error.response?.data);
-          console.error('Error status:', error.response?.status);
-          // Simple fallback welcome message
+          // User-friendly fallback welcome message
           addBotMessage("Hi there! I'm your LockIn study buddy! 🎯\n\nWhat would you like to work on today?");
         }
       }, 500);
@@ -131,7 +115,7 @@ const Chatbot = ({ onAddTasks }) => {
         setSessionId(res.data.sessionId);
       }
     } catch (error) {
-      console.error('AI Chat Error:', error);
+      // User-friendly error for chat failure
       addBotMessage("I'm sorry, I'm having trouble connecting to my AI brain right now. Please try again in a moment! 🤖");
     }
     
@@ -164,7 +148,7 @@ const Chatbot = ({ onAddTasks }) => {
       });
       addBotMessage(res.data.message);
     } catch (error) {
-      console.error('Failed to get task suggestions:', error);
+      // User-friendly error for task suggestions
       addBotMessage("I'm sorry, I couldn't generate task suggestions right now. Please try again!");
     }
   };
@@ -176,7 +160,7 @@ const Chatbot = ({ onAddTasks }) => {
         preferences: preferences
       });
     } catch (error) {
-      console.error('Failed to update preferences:', error);
+      // User-friendly error for preferences update (silent)
     }
   };
 
@@ -186,7 +170,8 @@ const Chatbot = ({ onAddTasks }) => {
       setMessages([]);
       addBotMessage("Chat history cleared! Starting fresh. 🆕");
     } catch (error) {
-      console.error('Failed to clear history:', error);
+      // User-friendly error for clearing history
+      addBotMessage("Failed to clear chat history. Please try again later.");
     }
   };
 

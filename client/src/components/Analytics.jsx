@@ -17,7 +17,8 @@ function Analytics() {
         const res = await api.get('/sessions/stats');
         setStats(res.data);
       } catch (err) {
-        console.error('Failed to fetch stats:', err);
+        // Show user-friendly error (could use a toast or set an error state)
+        // Example: setError('Failed to fetch stats. Please try again later.');
       } finally {
         setLoading(false);
       }

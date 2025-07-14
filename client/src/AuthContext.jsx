@@ -13,10 +13,8 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('AuthContext useEffect, token:', token);
     if (token) {
       setUser({ token });
-      console.log('User set in AuthContext:', { token });
     }
     setLoading(false);
   }, []);

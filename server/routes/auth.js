@@ -74,7 +74,6 @@ router.post('/login', loginValidation, validate, async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     const responseTime = Date.now() - startTime;
-    console.log(`Login completed in ${responseTime}ms for user: ${email}`);
     
     res.json({
       token,
@@ -91,7 +90,6 @@ router.post('/login', loginValidation, validate, async (req, res) => {
     });
   } catch (err) {
     const responseTime = Date.now() - startTime;
-    console.error(`Login failed in ${responseTime}ms for user: ${req.body?.email}`, err.message);
     res.status(500).json({ error: 'Internal server error. Please try again.' });
   }
 });

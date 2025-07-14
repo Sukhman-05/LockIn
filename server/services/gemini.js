@@ -102,9 +102,7 @@ Respond as a helpful study companion:`;
       
       return text;
     } catch (error) {
-      console.error('Gemini API Error:', error);
-      
-      // Fallback to rule-based responses if AI fails
+      // Gemini API Error: fallback to rule-based responses if AI fails
       return this.getFallbackResponse(userMessage);
     }
   }

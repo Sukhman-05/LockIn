@@ -189,7 +189,6 @@ export default function Timer({ onSessionUpdate }) {
       const newTask = { text: trimmedInput, done: false, id: Date.now() };
       setTasks(prevTasks => [...prevTasks, newTask]);
       setTaskInput('');
-      console.log('Task added:', newTask);
     }
   };
   
@@ -199,13 +198,11 @@ export default function Timer({ onSessionUpdate }) {
         i === idx ? { ...task, done: !task.done } : task
       )
     );
-    console.log('Task toggled at index:', idx);
   };
   
   const removeTask = (idx) => {
     setTasks(prevTasks => {
       const newTasks = prevTasks.filter((_, i) => i !== idx);
-      console.log('Task removed at index:', idx, 'New tasks:', newTasks);
       return newTasks;
     });
   };

@@ -28,13 +28,11 @@ const TaskPlanner = () => {
   const loadTasks = async () => {
     try {
       setLoading(true);
-      console.log('Attempting to load tasks...');
       const response = await api.get('/tasks');
-      console.log('Tasks response:', response.data);
       setTasks(response.data);
     } catch (error) {
-      console.error('Failed to load tasks:', error);
-      console.error('Error details:', error.response?.data || error.message);
+      // Show user-friendly error (could use a toast or set an error state)
+      // Example: setError('Failed to load tasks. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -56,7 +54,8 @@ const TaskPlanner = () => {
       });
       setShowCreateForm(false);
     } catch (error) {
-      console.error('Failed to create task:', error);
+      // Show user-friendly error (could use a toast or set an error state)
+      // Example: setError('Failed to create task. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -71,7 +70,8 @@ const TaskPlanner = () => {
       ));
       setSelectedTask(response.data);
     } catch (error) {
-      console.error('Failed to plan task:', error);
+      // Show user-friendly error (could use a toast or set an error state)
+      // Example: setError('Failed to plan task. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,8 @@ const TaskPlanner = () => {
         setSelectedTask(response.data);
       }
     } catch (error) {
-      console.error('Failed to update chunk:', error);
+      // Show user-friendly error (could use a toast or set an error state)
+      // Example: setError('Failed to update chunk. Please try again later.');
     }
   };
 

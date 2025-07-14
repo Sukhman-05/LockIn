@@ -31,8 +31,8 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/lockin';
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => {/* MongoDB connected */})
+  .catch(err => {/* MongoDB connection error */});
 
 const authRouter = require('./routes/auth');
 const sessionRouter = require('./routes/session');
@@ -120,7 +120,7 @@ io.on('connection', (socket) => {
 
 if (require.main === module) {
   server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    // Server running
   });
 }
 
