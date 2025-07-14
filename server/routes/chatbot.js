@@ -245,7 +245,7 @@ router.post('/chat', authenticateToken, async (req, res) => {
 });
 
 // Get chat session info
-router.get('/session/:sessionId?', authenticateToken, async (req, res) => {
+router.get(['/session', '/session/:sessionId'], authenticateToken, async (req, res) => {
   try {
     const sessionId = req.params.sessionId;
     const sessionInfo = await geminiService.getSessionInfo(req.user.id, sessionId);
@@ -261,7 +261,7 @@ router.get('/session/:sessionId?', authenticateToken, async (req, res) => {
 });
 
 // Get conversation history
-router.get('/history/:sessionId?', authenticateToken, async (req, res) => {
+router.get(['/history', '/history/:sessionId'], authenticateToken, async (req, res) => {
   try {
     const sessionId = req.params.sessionId;
     const history = await geminiService.getHistory(req.user.id, sessionId);
@@ -292,7 +292,7 @@ router.put('/preferences', authenticateToken, async (req, res) => {
 });
 
 // Clear conversation history
-router.delete('/history/:sessionId?', authenticateToken, async (req, res) => {
+router.delete(['/history', '/history/:sessionId'], authenticateToken, async (req, res) => {
   try {
     const sessionId = req.params.sessionId;
     await geminiService.clearHistory(req.user.id, sessionId);
