@@ -8,6 +8,7 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -15,24 +16,62 @@ export default function SignIn() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setLoadingMessage('Connecting to server...');
+    
+    // Progressive loading messages for better UX
+    const loadingMessages = [
+      'Connecting to server...',
+      'Verifying credentials...',
+      'Setting up your session...',
+      'Almost there...'
+    ];
+    
+    let messageIndex = 0;
+    const messageInterval = setInterval(() => {
+      if (loading && messageIndex < loadingMessages.length - 1) {
+        messageIndex++;
+        setLoadingMessage(loadingMessages[messageIndex]);
+      }
+    }, 2000);
     
     // Add timeout for better UX
     const timeoutId = setTimeout(() => {
       if (loading) {
-        setError('Login is taking longer than expected. Please wait...');
+        setLoadingMessage('This is taking longer than usual. Please wait...');
       }
-    }, 5000);
+    }, 8000);
     
     try {
       const res = await api.post('/auth/login', { email, password });
       clearTimeout(timeoutId);
-      login(res.data.token);
-      navigate('/');
+      clearInterval(messageInterval);
+      
+      setLoadingMessage('Login successful! Redirecting...');
+      
+      // Small delay to show success message
+      setTimeout(() => {
+        login(res.data.token);
+        navigate('/');
+      }, 500);
+      
     } catch (err) {
       clearTimeout(timeoutId);
-      setError(err.response?.data?.message || 'Login failed');
+      clearInterval(messageInterval);
+      
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (err.message.includes('timeout')) {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err.message.includes('Unable to connect')) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
+      setLoadingMessage('');
     }
   };
 
@@ -53,6 +92,7 @@ export default function SignIn() {
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
+          disabled={loading}
         />
         <input
           type="password"
@@ -61,9 +101,21 @@ export default function SignIn() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
+          disabled={loading}
         />
-        <button type="submit" className="mt-2 px-6 py-2 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel flex items-center justify-center min-h-[2.5rem]">
-          {loading ? <span className="animate-spin h-5 w-5 border-2 border-pixelGray border-t-pixelOrange rounded-full inline-block"></span> : 'Sign In'}
+        <button 
+          type="submit" 
+          className="mt-2 px-6 py-2 bg-pixelYellow text-pixelGray border-2 border-pixelYellow rounded font-pixel text-base shadow-pixel hover:bg-pixelOrange hover:text-white transition-all btn-pixel flex items-center justify-center min-h-[2.5rem]"
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <span className="animate-spin h-5 w-5 border-2 border-pixelGray border-t-pixelOrange rounded-full inline-block"></span>
+              <span className="text-sm">{loadingMessage}</span>
+            </div>
+          ) : (
+            'Sign In'
+          )}
         </button>
         <div className="text-xs text-pixelYellow text-center mt-2">
           Don't have an account?{' '}
