@@ -246,12 +246,11 @@ const Chatbot = ({ onAddTasks }) => {
           ))}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-pixelGray/80 border-2 border-pixelYellow rounded-lg px-3 py-2">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                </div>
+              <div className="bg-pixelGray/80 border-2 border-pixelYellow rounded-lg px-3 py-2 flex items-center gap-2">
+                <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <span className="text-pixelYellow font-pixel text-xs ml-2">AI is typing...</span>
               </div>
             </div>
           )}

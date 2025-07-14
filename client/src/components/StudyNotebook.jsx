@@ -149,6 +149,7 @@ const StudyNotebook = () => {
       const notebookResponse = await api.get(`/notebooks/${selectedNotebook._id}`);
       setSelectedNotebook(notebookResponse.data);
       setSelectedConversation(response.data);
+      setMessages([]); // Clear messages for new conversation
       setActiveTab('chat');
     } catch (error) {
       console.error('Failed to create conversation:', error);
@@ -177,11 +178,12 @@ const StudyNotebook = () => {
 
     try {
       setLoading(true);
-      const response = await api.post(`/notebooks/${selectedNotebook._id}/conversations/${selectedConversation._id}/messages`, {
+      await api.post(`/notebooks/${selectedNotebook._id}/conversations/${selectedConversation._id}/messages`, {
         message: newMessage
       });
-
-      setMessages([...messages, response.data.userMessage, response.data.aiResponse]);
+      // Reload messages after sending
+      const response = await api.get(`/notebooks/${selectedNotebook._id}/conversations/${selectedConversation._id}/messages`);
+      setMessages(response.data);
       setNewMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -580,6 +582,16 @@ const StudyNotebook = () => {
                         </div>
                       </div>
                     ))}
+                    {loading && newMessage.trim() && (
+                      <div className="flex justify-start">
+                        <div className="bg-pixelGray/80 border-2 border-pixelYellow rounded-lg px-3 py-2 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-pixelYellow rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          <span className="text-pixelYellow font-pixel text-xs ml-2">AI is typing...</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <form onSubmit={handleSendMessage} className="flex gap-2">
                     <input
