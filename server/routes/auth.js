@@ -112,7 +112,7 @@ function auth(req, res, next) {
 // Get current user profile
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user).select('username email xp level portrait createdAt lastLoginDate streak');
+    const user = await User.findById(req.user).select('username email xp level portrait createdAt lastLoginDate streak hp');
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
