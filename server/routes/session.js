@@ -31,13 +31,29 @@ router.post('/', auth, sessionValidation, validate, async (req, res) => {
     // Update user stats
       const user = await User.findById(req.user);
     if (req.body.type === 'focus') {
-      await user.addXP(Math.floor(req.body.duration / 60)); // 1 XP per minute
-      await user.updateStreak();
+      const minutes = Math.floor(req.body.duration / 60);
+      user.xp += minutes;
+      user.level = Math.floor(user.xp / 100) + 1;
       user.totalFocusTime += req.body.duration;
+      // Update streakHistory for today if not present
+      const today = new Date();
+      const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      if (!user.streakHistory.some(d => new Date(d).getTime() === todayDay.getTime())) {
+        user.streakHistory.push(todayDay);
+      }
+      // Increment totalSessions and handle XP reward/reset
+      user.totalSessions = (user.totalSessions || 0) + 1;
+      let sessionMilestone = false;
+      if (user.totalSessions >= 30) {
+        user.xp += 50; // Award 50 XP
+        user.level = Math.floor(user.xp / 100) + 1;
+        user.totalSessions = 0; // Reset session count
+        sessionMilestone = true;
+      }
       await user.save();
     }
     
-    res.status(201).json(session);
+    res.status(201).json({ session, totalSessions: user.totalSessions, sessionMilestone });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -83,6 +99,39 @@ router.get('/stats', auth, async (req, res) => {
     res.json({ daily });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH: Decrease HP if user quits mid-session
+router.patch('/hp', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    const loss = req.body.loss || 10;
+    user.hp = Math.max(0, user.hp - loss);
+    await user.save();
+    res.json({ hp: user.hp });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET: Streak calendar for user
+router.get('/streak', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    res.json({ streak: user.streak, streakHistory: user.streakHistory });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET: Get user's totalSessions (for session-based calendar)
+router.get('/totalsessions', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    res.json({ totalSessions: user.totalSessions || 0 });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 

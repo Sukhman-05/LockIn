@@ -18,16 +18,85 @@ router.post('/register', async (req, res) => {
 
 // Login
 router.post('/login', async (req, res) => {
+  const startTime = Date.now();
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+    
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+    
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    // Simplified streak logic for better performance
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let streakUpdated = false;
+    
+    // Only update streak if it's a new day
+    if (!user.lastLoginDate || today > new Date(user.lastLoginDate.getFullYear(), user.lastLoginDate.getMonth(), user.lastLoginDate.getDate())) {
+      if (user.lastLoginDate) {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const lastLoginDay = new Date(user.lastLoginDate.getFullYear(), user.lastLoginDate.getMonth(), user.lastLoginDate.getDate());
+        
+        if (yesterday.getTime() === lastLoginDay.getTime()) {
+          // Yesterday login, increment streak
+          user.streak += 1;
+        } else {
+          // Missed a day, reset streak
+          user.streak = 1;
+        }
+      } else {
+        // First login
+        user.streak = 1;
+      }
+      user.streakHistory.push(today);
+      streakUpdated = true;
+    }
+    
+    user.lastLoginDate = now;
+    
+    // Use updateOne for better performance instead of save()
+    await User.updateOne(
+      { _id: user._id },
+      { 
+        lastLoginDate: now,
+        streak: user.streak,
+        $push: { streakHistory: today }
+      }
+    );
+
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    const responseTime = Date.now() - startTime;
+    console.log(`Login completed in ${responseTime}ms for user: ${email}`);
+    
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        streak: user.streak,
+        hp: user.hp,
+        streakHistory: user.streakHistory,
+      },
+      streakUpdated,
+      responseTime
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    const responseTime = Date.now() - startTime;
+    console.error(`Login failed in ${responseTime}ms for user: ${req.body?.email}`, err.message);
+    res.status(500).json({ error: 'Internal server error. Please try again.' });
   }
 });
 
@@ -47,8 +116,22 @@ function auth(req, res, next) {
 // Get current user profile
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user).select('username email xp level');
+    const user = await User.findById(req.user).select('username email xp level portrait createdAt lastLoginDate');
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update user portrait
+router.patch('/me', auth, async (req, res) => {
+  try {
+    const { portrait, background } = req.body;
+    const user = await User.findById(req.user);
+    if (portrait) user.portrait = portrait;
+    if (background) user.background = background;
+    await user.save();
+    res.json({ portrait: user.portrait, background: user.background });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

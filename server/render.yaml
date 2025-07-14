@@ -10,4 +10,6 @@ services:
         value: ${{ MONGO_URI }}
       - key: JWT_SECRET
         value: ${{ JWT_SECRET }}
+      - key: GEMINI_API_KEY
+        value: ${{ GEMINI_API_KEY }}
     autoDeploy: true 

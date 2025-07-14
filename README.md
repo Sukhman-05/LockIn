@@ -17,6 +17,14 @@ A modern web application designed to help students and professionals "lock in" a
 - **Leaderboards**: Compete with other users
 - **Badges**: Unlock achievements for milestones
 
+### 🤖 AI Study Buddy
+- **Intelligent Chatbot**: Personalized study companion
+- **Motivation System**: Context-aware encouragement based on your progress
+- **Task Organization**: Help break down projects and organize to-do lists
+- **Study Techniques**: Personalized tips based on your study patterns
+- **Reminder System**: Smart notifications to keep you on track
+- **Subject-Specific Help**: Specialized guidance for different subjects
+
 ### 👥 Study Pods (Real-time Collaboration)
 - **Create/Join Pods**: Generate or join study groups with unique codes
 - **Synchronized Timers**: Real-time shared Pomodoro sessions
@@ -185,6 +193,13 @@ VITE_SOCKET_URL=http://localhost:5000
 - `POST /api/pods` - Create study pod
 - `POST /api/pods/join` - Join study pod
 
+### Chatbot
+- `GET /api/chatbot/stats` - Get personalized study statistics
+- `GET /api/chatbot/motivation` - Get contextual motivational messages
+- `GET /api/chatbot/reminders` - Get study session reminders
+- `GET /api/chatbot/tips` - Get personalized study tips
+- `POST /api/chatbot/tasks` - Save user task lists
+
 ## 🎯 Roadmap
 
 ### Phase 1 (Current)
@@ -193,11 +208,13 @@ VITE_SOCKET_URL=http://localhost:5000
 - ✅ Session tracking
 - ✅ Study pods
 - ✅ Leaderboards
+- ✅ AI Study Buddy chatbot
 
 ### Phase 2 (Next)
 - [ ] Advanced analytics
 - [ ] Mobile app
 - [ ] Offline support
+- [ ] Enhanced AI features
 - [ ] Integration with calendar apps
 - [ ] Team challenges
 

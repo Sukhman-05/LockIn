@@ -11,8 +11,18 @@ const app = express();
 app.use(securityHeaders);
 app.use(apiLimiter);
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-domain.vercel.app'] 
+    : ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
+
+// Trust proxy for correct rate limiting and IP detection
+app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/lockin';
@@ -25,13 +35,65 @@ const authRouter = require('./routes/auth');
 const sessionRouter = require('./routes/session');
 const leaderboardRouter = require('./routes/leaderboard');
 const podRouter = require('./routes/pod');
+const chatbotRouter = require('./routes/chatbot');
+const taskRouter = require('./routes/tasks');
+const notebookRouter = require('./routes/notebooks');
 app.use('/api/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/pods', podRouter);
+app.use('/api/chatbot', chatbotRouter);
+app.use('/api/tasks', taskRouter);
+app.use('/api/notebooks', notebookRouter);
 
 app.get('/api', (req, res) => {
   res.json({ message: 'API is running' });
+});
+
+// Test endpoint for debugging
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Health check endpoint for monitoring
+app.get('/api/health', (req, res) => {
+  const startTime = Date.now();
+  
+  // Check database connection
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = dbState === 1 ? 'connected' : 'disconnected';
+  
+  const responseTime = Date.now() - startTime;
+  
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    database: dbStatus,
+    responseTime: `${responseTime}ms`,
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
+});
+
+// API-only backend - frontend is deployed separately on Vercel
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'LockIn API Server', 
+    status: 'running',
+    endpoints: [
+      '/api/auth',
+      '/api/sessions', 
+      '/api/leaderboard',
+      '/api/pods',
+      '/api/chatbot',
+      '/api/tasks',
+      '/api/notebooks'
+    ]
+  });
 });
 
 // Error handling middleware (must be last)
