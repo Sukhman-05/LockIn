@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
-import { api } from '../utils/api';
+import api from '../utils/api';
 
 const TaskPlanner = () => {
   const { user } = useAuth();
